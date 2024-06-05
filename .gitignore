@@ -36,3 +36,6 @@ venv.bak/
 
 # Big csv
 *.csv
+
+#DSStore
+.DS_Store
