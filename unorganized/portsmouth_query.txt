@@ -1,1 +1,0 @@
-SELECT specobjID, bpt FROM emissionLinesPort WHERE EXISTS (SELECT 1 FROM (VALUES (6177.0, 56268.0, 391.0),(387.0, 51791.0, 492.0),(387.0, 51791.0, 446.0),(7751.0, 58081.0, 17.0),(750.0, 52235.0, 82.0)) AS t(plate_val, mjd_val, fiberID_val) WHERE plate = t.plate_val AND mjd = t.mjd_val AND fiberID = t.fiberID_val)
