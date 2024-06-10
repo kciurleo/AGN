@@ -36,6 +36,7 @@ venv.bak/
 
 # Big csv, currently all csv
 *.csv
+*.txt
 /Users/kciurleo/Documents/kciurleo/AGN/unorganized/CSC2.1p_OIR_SDSSspecmatch.csv
 
 #DSStore

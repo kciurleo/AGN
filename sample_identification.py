@@ -1,5 +1,7 @@
 import pandas as pd
 
+#Note to self: check file paths
+
 #Read CSC 2.1 into dataframe
 filename='/Users/kciurleo/Documents/kciurleo/AGN/unorganized/CSC2.1p_OIR_SDSSspecmatch.csv'
 data=pd.read_csv(filename)
@@ -50,3 +52,8 @@ print(f'Portsmouth or Agostino Seyferts: {len(outer_s2)}')
 print()
 print(f'Marginal likelihood Portsmouth AGN: {len(portsmouth_s2.loc[portsmouth_s2["likelihood_class"]=="MARGINAL"])}')
 print(f'Marginal likelihood Agostino AGN: {len(agostino_s2.loc[agostino_s2["likelihood_class"]=="MARGINAL"])}')
+
+#What do the extra agostino seyferts look like in the portsmouth categorization?
+unique_to_agostino = pd.merge(agostino_s2, inner_s2, how='left', indicator=True)
+unique_to_agostino = unique_to_agostino[unique_to_agostino['_merge'] == 'left_only'].drop(columns=['_merge'])
+print(f'Unique to Agostino Seyferts are classified as {unique_to_agostino["bpt"].unique()} in Portsmouth')
