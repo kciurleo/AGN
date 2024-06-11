@@ -3,9 +3,7 @@ import pandas as pd
 #Note to self: check file paths
 
 #Read CSC 2.1 into dataframe
-filename='/Users/kciurleo/Documents/kciurleo/AGN/unorganized/CSC2.1p_OIR_SDSSspecmatch.csv'
-data=pd.read_csv(filename)
-columns = data.columns
+data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/unorganized/CSC2.1p_OIR_SDSSspecmatch.csv')
 
 #Find only sources with SDSS data
 sources = data.dropna(subset=['Sep_SPEC_CSC21P'])
