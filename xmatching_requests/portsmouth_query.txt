@@ -1,0 +1,37 @@
+# Using CasJobs (https://skyserver.sdss.org/CasJobs/default.aspx), this queries the Portsmouth table, 
+# given you've uploaded a table to your personal database there called pointsources which has columns
+# PLATE, MJD, and FIBERID with their associated SDSS value
+
+SELECT
+  specobjID,
+  bpt,
+  plate,
+  mjd,
+  fiberID,
+  Flux_OIII_5006,
+  Flux_OIII_5006_Err,
+  Flux_Hb_4861,
+  Flux_Hb_4861_Err,
+  Flux_Ha_6562,
+  Flux_Ha_6562_Err,
+  Flux_NII_6583,
+  Flux_NII_6583_Err,
+  Flux_SII_6716,
+  Flux_SII_6716_Err,
+  Flux_SII_6730,
+  Flux_SII_6730_Err,
+  Flux_OI_6363,
+  Flux_OI_6363_Err
+FROM
+    emissionLinesPort
+WHERE
+    EXISTS (
+   	 SELECT
+   		 1
+   	 FROM
+   		 MyDB.pointsources AS t
+   	 WHERE
+   		 emissionLinesPort.plate = t.PLATE
+   		 AND emissionLinesPort.mjd = t.MJD
+   		 AND emissionLinesPort.fiberID = t.FIBERID
+    )

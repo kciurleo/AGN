@@ -1,0 +1,19 @@
+# Using CasJobs (https://skyserver.sdss.org/CasJobs/default.aspx), this queries all SDSS objects
+# to return the spectral object ID associated with the Agostino objects, given you've uploaded a 
+# table to your personal database there called agostino which has column SDSS_ObjID
+
+SELECT
+  objID,
+  specobjID
+FROM
+    PhotoObjAll as p
+WHERE
+	EXISTS (
+    	SELECT
+        	1
+    	FROM
+        	MyDB.agostino AS t
+    	WHERE
+        	p.objID = t.SDSS_ObjID
+
+	)
