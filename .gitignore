@@ -34,9 +34,9 @@ venv.bak/
 *.fits
 *.fits.gz
 
-# Big csv, currently all csv
+# Big csv, etc
 *.csv
-/Users/kciurleo/Documents/kciurleo/AGN/unorganized/CSC2.1p_OIR_SDSSspecmatch.csv
+*xml
 
 #DSStore
 .DS_Store 
