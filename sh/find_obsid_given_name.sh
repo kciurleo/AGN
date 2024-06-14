@@ -3,6 +3,8 @@
 #This script takes in a file with a column of IAU names, then finds the chandra OBSIDs (and dates and lengths/times)
 #and returns a new file with added columns for the above and a row for each unique OBSID (so targets may have multiple rows)
 
+#If there's an error with finding the obsid, return NaN values for the relevant new columns.
+
 #File with names
 input_file="/Users/kciurleo/Documents/kciurleo/file.csv"
 
@@ -45,9 +47,11 @@ while IFS= read -r line; do
     #Find chandra obsids
     obsid_data=$(find_chandra_obsid "$iauname")
 
-    #Check if find_chandra_obsid had an error, not sure if this actually works
+    #Check if find_chandra_obsid had an error
     if [ $? -ne 0 ]; then
-        echo "ERROR while finding $iauname"
+        #Add NaN values and continue
+        new_line="$line,NaN,NaN,NaN"
+        echo "$new_line" >> "$output_file"
         continue
     fi
 
