@@ -36,6 +36,7 @@ venv.bak/
 
 # Big csv, etc
 *.csv
+*.txt
 *xml
 
 #DSStore

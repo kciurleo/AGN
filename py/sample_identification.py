@@ -81,6 +81,7 @@ inner_s2=pd.merge(agostino_s2, portsmouth_s2, how='inner')
 
 #Those classified by either
 outer_s2=pd.merge(agostino_s2, portsmouth_s2, how='outer')
+outer_s2.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.csv', index=False) 
 
 #Those that are fully unclassified by both agostino and portsmouth
 unclassified = full_point_sources.loc[((full_point_sources.bpt.isnull()) | (full_point_sources['bpt']=="BLANK")) & ((full_point_sources['sl_class1']==0) | (full_point_sources.sl_class1.isnull()))] 

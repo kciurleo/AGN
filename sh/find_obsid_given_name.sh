@@ -6,13 +6,13 @@
 #If there's an error with finding the obsid, return NaN values for the relevant new columns.
 
 #File with names
-input_file="/Users/kciurleo/Documents/kciurleo/file.csv"
+input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.csv"
 
 #Output file
-output_file="/Users/kciurleo/Documents/kciurleo/new_file.csv"
+output_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/obsids_seyferts.csv"
 
 #Column name of IAU object name
-column_name="IAUNAME"
+column_name="IAU_stripped"
 
 #Columns to add
 new_columns="CHANDRA_OBSID, OBSDATE, TIME"
