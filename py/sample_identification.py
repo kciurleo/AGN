@@ -1,10 +1,16 @@
+#This file selects Seyferts out of CSC2.1, with the help of queries agostino_query.txt and portsmouth_query.txt
+#and returns useful statistics on the sample
+
 import pandas as pd
 from astropy.io import votable
 
-#Note to self: check file paths\
+#Note to self: check file paths
 
 #Read CSC 2.1 into dataframe
 data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv')
+
+#Read in 2.0
+old_data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/oldXmatch.csv')
 
 #Read 4XMM-DR13 into dataframe
 XMM=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/4XMM_DR13cat_v1.0.csv')
@@ -13,12 +19,22 @@ XMM=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/4XMM_DR13cat_v1.0.c
 SPIDERSROS = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/spidersros.xml').to_table().to_pandas()
 SPIDERSXMM = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/spidersxmm.xml').to_table().to_pandas()
 
+#Portsmouth classifications https://salims.pages.iu.edu/agn/
+portsmouth=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/point_sources_classified_lines.csv')
+
+#Agostino classifications https://salims.pages.iu.edu/agn/ and spectral IDs
+agostino=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/agostino2021_table1.csv')
+agostino_IDs=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/agostino_specIDs.csv')
+
 #Rename XMM ra/dec to avoid confusion later on
 XMM['XMM_ra']=XMM['ra']
 XMM['XMM_dec']=XMM['dec']
 
 #Add IAU name for easy crossmatching later
 XMM['IAU_stripped']=XMM['iauname'].str[5:]
+
+#To compare CSC2.1 to CSC2.0:
+both_data = data.merge(old_data, indicator=True, how='inner', left_on='CSC21P_name', right_on='CSC2_ID')
 
 #Find only sources with SDSS data
 sources = data.dropna(subset=['Sep_SPEC_CSC21P'])
@@ -28,12 +44,6 @@ point_sources = sources.loc[sources['extent_flag']==False]
 
 #Saved point sources as csv, which was used in SciServer CasJobs SQL query to get Portsmouth classifications
 point_sources.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/point_sources.csv', index=False) 
-
-#Portsmouth classifications https://salims.pages.iu.edu/agn/
-portsmouth=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/point_sources_classified_lines.csv')
-
-#Agostino classifications https://salims.pages.iu.edu/agn/
-agostino=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/agostino2021_table1.csv')
 
 #Find all XMM SPIDERS 
 xspi_s2 = SPIDERSXMM.loc[(SPIDERSXMM['source_type']=="NLAGN")]
@@ -45,8 +55,7 @@ rosspi_s2 = rosspi_points.loc[(rosspi_points['source_type']=="NLAGN")]
 #Combined SPIDERS s2
 spi_s2 = pd.merge(rosspi_s2, xspi_s2, how="outer", on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'])
 
-#Get the agostino spectral ids and merge into normal agostino table
-agostino_IDs=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/agostino_specIDs.csv')
+#Merge agostino IDs into normal agostino table
 agostino_full =pd.merge(agostino_IDs, agostino, left_on=['objID'], right_on=['SDSS_ObjID'], how='inner')
 
 #Combine our point source table, portsmouth classification, and agostino classifications
@@ -58,6 +67,7 @@ classified_point_sources['IAU_stripped']=classified_point_sources['CSC21P_name']
 
 #Make full table of XMM and CSC data
 full_point_sources=pd.merge(classified_point_sources,XMM,how='left', on=['IAU_stripped'])
+full_point_sources.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/full_point_sources.csv', index=False) 
 
 #Subset of point sources with XMM data
 XMM_point_sources=full_point_sources.loc[full_point_sources['detid'] >0]
@@ -75,7 +85,13 @@ outer_s2=pd.merge(agostino_s2, portsmouth_s2, how='outer')
 #Those that are fully unclassified by both agostino and portsmouth
 unclassified = full_point_sources.loc[((full_point_sources.bpt.isnull()) | (full_point_sources['bpt']=="BLANK")) & ((full_point_sources['sl_class1']==0) | (full_point_sources.sl_class1.isnull()))] 
 
-print(f'Total observations in crossmatch: {len(data)}')
+print(f'Sources in 2.1: {len(data):,}')
+print(f'Sources in 2.0: {len(old_data):,}')
+print(f'Sources in both: {len(both_data):,}')
+print(f'Sources from 2.0 excluded from 2.1: {len(old_data)-len(both_data):,} ')
+print(f'New sources in 2.1: {len(data)-len(both_data):,}')
+print()
+print(f'Total observations in 2.1 crossmatch: {len(data)}')
 print(f'Sources matched with SDSS: {len(sources)}, {len(data)-len(sources)} not observed with SDSS')
 print(f'Point sources: {len(point_sources)}, {len(sources)-len(point_sources)} extended sources')
 print(f'Unique point sources with exact XMM data: {len(XMM_point_sources["IAU_stripped"].unique())}')
