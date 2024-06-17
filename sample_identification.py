@@ -1,9 +1,24 @@
 import pandas as pd
+from astropy.io import votable
 
-#Note to self: check file paths
+#Note to self: check file paths\
 
 #Read CSC 2.1 into dataframe
-data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/unorganized/CSC2.1p_OIR_SDSSspecmatch.csv')
+data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv')
+
+#Read 4XMM-DR13 into dataframe
+XMM=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/4XMM_DR13cat_v1.0.csv')
+
+#Read in SPIDERS data
+SPIDERSROS = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/spidersros.xml').to_table().to_pandas()
+SPIDERSXMM = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/spidersxmm.xml').to_table().to_pandas()
+
+#Rename XMM ra/dec to avoid confusion later on
+XMM['XMM_ra']=XMM['ra']
+XMM['XMM_dec']=XMM['dec']
+
+#Add IAU name for easy crossmatching later
+XMM['IAU_stripped']=XMM['iauname'].str[5:]
 
 #Find only sources with SDSS data
 sources = data.dropna(subset=['Sep_SPEC_CSC21P'])
@@ -12,25 +27,44 @@ sources = data.dropna(subset=['Sep_SPEC_CSC21P'])
 point_sources = sources.loc[sources['extent_flag']==False]
 
 #Saved point sources as csv, which was used in SciServer CasJobs SQL query to get Portsmouth classifications
-point_sources.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/unorganized/point_sources.csv', index=False) 
+point_sources.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/point_sources.csv', index=False) 
 
 #Portsmouth classifications https://salims.pages.iu.edu/agn/
-portsmouth=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/unorganized/point_source_classifications.csv')
+portsmouth=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/point_sources_classified_lines.csv')
 
 #Agostino classifications https://salims.pages.iu.edu/agn/
-agostino=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/unorganized/agostino2021_table1.csv')
+agostino=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/agostino2021_table1.csv')
+
+#Find all XMM SPIDERS 
+xspi_s2 = SPIDERSXMM.loc[(SPIDERSXMM['source_type']=="NLAGN")]
+
+#Find all ROSAT SPIDERS which are point sources, and then which are S2
+rosspi_points = SPIDERSROS.loc[(SPIDERSROS['extent_likelihood']<1)]
+rosspi_s2 = rosspi_points.loc[(rosspi_points['source_type']=="NLAGN")]
+
+#Combined SPIDERS s2
+spi_s2 = pd.merge(rosspi_s2, xspi_s2, how="outer", on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'])
 
 #Get the agostino spectral ids and merge into normal agostino table
-agostino_IDs=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/unorganized/agostino_specIDs.csv')
+agostino_IDs=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/agostino_specIDs.csv')
 agostino_full =pd.merge(agostino_IDs, agostino, left_on=['objID'], right_on=['SDSS_ObjID'], how='inner')
 
-#Combine our point source table, portsmouth classification, and agostine classifications
+#Combine our point source table, portsmouth classification, and agostino classifications
 combined = pd.merge(point_sources, portsmouth, left_on=['PLATE', 'MJD', 'FIBERID'],right_on=['plate', 'mjd', 'fiberID'], how='left')
 classified_point_sources = pd.merge(combined, agostino_full, left_on =['specobjID'],right_on=['specobjID'],how='left')
 
-#Find only Seyfert Galaxies, classified as bpt="Seyfert" for Portsmouth and sl_class1=1 for Agostino
-portsmouth_s2=classified_point_sources.loc[classified_point_sources['bpt']=="Seyfert"]
-agostino_s2=classified_point_sources.loc[classified_point_sources['sl_class1']==1]
+#Add IAU name to our sources
+classified_point_sources['IAU_stripped']=classified_point_sources['CSC21P_name'].str[5:]
+
+#Make full table of XMM and CSC data
+full_point_sources=pd.merge(classified_point_sources,XMM,how='left', on=['IAU_stripped'])
+
+#Subset of point sources with XMM data
+XMM_point_sources=full_point_sources.loc[full_point_sources['detid'] >0]
+
+#Find only Seyfert Galaxies, classified as bpt="Seyfert" for Portsmouth and sl_class1=1 for Agostino (latter is specifically Seyfert 2s)
+portsmouth_s2=full_point_sources.loc[full_point_sources['bpt']=="Seyfert"]
+agostino_s2=full_point_sources.loc[full_point_sources['sl_class1']==1]
 
 #Those classified by both
 inner_s2=pd.merge(agostino_s2, portsmouth_s2, how='inner')
@@ -38,20 +72,25 @@ inner_s2=pd.merge(agostino_s2, portsmouth_s2, how='inner')
 #Those classified by either
 outer_s2=pd.merge(agostino_s2, portsmouth_s2, how='outer')
 
-print(f'Total observations in crossmatch: {len(data)}')
-print(f'All source count: {len(sources)}, {len(data)-len(sources)} not observed with SDSS')
-print(f'Point source count: {len(point_sources)}, {len(sources)-len(point_sources)} extended sources')
-print()
-print(f'Portsmouth Seyferts:{len(portsmouth_s2)}, {len(point_sources)-len(portsmouth_s2)} non-Seyferts')
-print(f'Agostino Seyferts: {len(agostino_s2)}, {len(point_sources)-len(agostino_s2)} non-Seyferts')
-print()
-print(f'Portsmouth-Agostino Seyferts: {len(inner_s2)}')
-print(f'Portsmouth or Agostino Seyferts: {len(outer_s2)}')
-print()
-print(f'Marginal likelihood Portsmouth AGN: {len(portsmouth_s2.loc[portsmouth_s2["likelihood_class"]=="MARGINAL"])}')
-print(f'Marginal likelihood Agostino AGN: {len(agostino_s2.loc[agostino_s2["likelihood_class"]=="MARGINAL"])}')
+#Those that are fully unclassified by both agostino and portsmouth
+unclassified = full_point_sources.loc[((full_point_sources.bpt.isnull()) | (full_point_sources['bpt']=="BLANK")) & ((full_point_sources['sl_class1']==0) | (full_point_sources.sl_class1.isnull()))] 
 
-#What do the extra agostino seyferts look like in the portsmouth categorization?
-unique_to_agostino = pd.merge(agostino_s2, inner_s2, how='left', indicator=True)
-unique_to_agostino = unique_to_agostino[unique_to_agostino['_merge'] == 'left_only'].drop(columns=['_merge'])
-print(f'Unique to Agostino Seyferts are classified as {unique_to_agostino["bpt"].unique()} in Portsmouth')
+print(f'Total observations in crossmatch: {len(data)}')
+print(f'Sources matched with SDSS: {len(sources)}, {len(data)-len(sources)} not observed with SDSS')
+print(f'Point sources: {len(point_sources)}, {len(sources)-len(point_sources)} extended sources')
+print(f'Unique point sources with exact XMM data: {len(XMM_point_sources["IAU_stripped"].unique())}')
+print()
+print(f'Unique SPIDERSROS point sources: {len(rosspi_points["name"].unique())}, {len(SPIDERSROS["name"].unique()) - len(rosspi_points["name"].unique())} sources with extent likelihood >1')
+print(f'Unique SPIDERSROS NLAGN: {len(rosspi_s2["name"].unique())}, {len(rosspi_points["name"].unique())-len(rosspi_s2["name"].unique())} non-Seyfert 2s')
+print(f'Unique SPIDERSXMM NLAGN: {len(xspi_s2["name"].unique())}, {len(SPIDERSXMM["name"].unique())-len(xspi_s2["name"].unique())} non-Seyfert 2s')
+print(f'Total SPIDERS NLAGN: {len(spi_s2)}')
+print(f"Total SPIDERS present in CSC2.1: {len(pd.merge(spi_s2, classified_point_sources, left_on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'], right_on=['PLATE', 'MJD', 'FIBERID'],how='inner'))}")
+print()
+print(f'Unique unclassifiable or non-classified sources: {len(unclassified["CSC21P_name"].unique())}')
+print(f'Unique Portsmouth Seyferts: {len(portsmouth_s2["CSC21P_name"].unique())}, {len(point_sources["CSC21P_name"].unique())-len(unclassified["CSC21P_name"].unique())-len(portsmouth_s2["CSC21P_name"].unique())} classified non-Seyferts')
+print(f'Unique Agostino Seyferts: {len(agostino_s2["CSC21P_name"].unique())}, {len(point_sources["CSC21P_name"].unique())-len(unclassified["CSC21P_name"].unique())-len(agostino_s2["CSC21P_name"].unique())} classified non-Seyferts')
+print()
+print(f'Unique Portsmouth-Agostino Seyferts: {len(inner_s2["CSC21P_name"].unique())}')
+print(f'Unique Portsmouth or Agostino Seyferts: {len(outer_s2["CSC21P_name"].unique())}')
+print(f"Unique Portsmouth or Agostino Seyferts processed with 2.1: {len(outer_s2.loc[outer_s2['csc2.1_flag']==True]['CSC21P_name'].unique())}, {len(outer_s2) -len(outer_s2.loc[outer_s2['csc2.1_flag']==True]['CSC21P_name'].unique())} not yet processed")
+print(f'Unique Portsmouth or Agostino Seyferts with exact XMM data: {len(outer_s2["detid"].unique())}')
