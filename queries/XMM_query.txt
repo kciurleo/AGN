@@ -1,0 +1,7 @@
+SELECT 
+    dr13.ra,dr13.dec,dr13.duration,dr13.IAUNAME,
+    my_cat.ra_x,my_cat.dec_x,my_cat.IAU_stripped,my_cat.MJD,my_cat.FIBERID,my_cat.PLATE
+FROM 
+    xsa.v_epic_source_cat AS dr13 
+JOIN 
+    TAP_UPLOAD.table_f AS my_cat ON 1=contains(point('ICRS',dr13.ra,dr13.dec),circle('ICRS',my_cat.ra_x,my_cat.dec_x,10./3600.))

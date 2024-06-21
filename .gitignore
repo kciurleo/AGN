@@ -35,9 +35,9 @@ venv.bak/
 *.fits.gz
 
 # Big csv, etc
+*csvs/*
+!queries/*
 *.csv
-*.txt
-*xml
 
 #DSStore
 .DS_Store 

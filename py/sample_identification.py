@@ -3,11 +3,12 @@
 
 import pandas as pd
 from astropy.io import votable
+from astropy.table import Table
 
 #Note to self: check file paths
 
 #Read CSC 2.1 into dataframe
-data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv')
+data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv', low_memory=Fal)
 
 #Read in 2.0
 old_data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/oldXmatch.csv')
@@ -82,6 +83,10 @@ inner_s2=pd.merge(agostino_s2, portsmouth_s2, how='inner')
 #Those classified by either
 outer_s2=pd.merge(agostino_s2, portsmouth_s2, how='outer')
 outer_s2.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.csv', index=False) 
+
+#Convert to votable
+table = Table.from_pandas(outer_s2)
+table.write('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.vot', overwrite=True,format='votable')
 
 #Those that are fully unclassified by both agostino and portsmouth
 unclassified = full_point_sources.loc[((full_point_sources.bpt.isnull()) | (full_point_sources['bpt']=="BLANK")) & ((full_point_sources['sl_class1']==0) | (full_point_sources.sl_class1.isnull()))] 

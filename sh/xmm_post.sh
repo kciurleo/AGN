@@ -2,9 +2,9 @@
 
 # This script runs an asynchronous post request to ESAC based on a query txt file and input votable
 
-#Files
+# Files
 query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/XMM_query.txt"
-table="/Users/kciurleo/Documents/kciurleo/test_votable.vot"
+table="/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.vot"
 
 # Read the query from query.txt, changing new lines and tabs to spaces
 query=$(cat "$query_file" | tr '\n\t' ' ')
@@ -19,3 +19,10 @@ curl -i -X POST \
     --form REQUEST=doQuery \
     --form QUERY="$query" \
     "https://nxsa.esac.esa.int/tap-server/tap/async"
+
+# After running this script, the request lists a location 
+# (e.g. Location: http://nxsa.esac.esa.int/tap-server/tap/async/1718984677210O)
+# Add /results/result to the end of the location to see whether the action is
+# still executing, or to download the resulting vot table.
+
+# Alternatively, curl -o output_table.vot "$location/results/result" 
