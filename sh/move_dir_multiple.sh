@@ -4,7 +4,7 @@
 # This version accounts for the possibility that the file is in two places, and skips the copying
 # if the file already exists at the end directory.
 
-input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/haves.txt"
+input_file="/Users/kciurleo/Downloads/seths_obsids.txt"
 
 # Directories
 start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
