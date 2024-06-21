@@ -8,7 +8,7 @@ from astropy.table import Table
 #Note to self: check file paths
 
 #Read CSC 2.1 into dataframe
-data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv', low_memory=Fal)
+data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv', low_memory=False)
 
 #Read in 2.0
 old_data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/oldXmatch.csv')
@@ -85,7 +85,9 @@ outer_s2=pd.merge(agostino_s2, portsmouth_s2, how='outer')
 outer_s2.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.csv', index=False) 
 
 #Convert to votable
-table = Table.from_pandas(outer_s2)
+seyfertsvot = outer_s2[['ra_x','dec_x', 'IAU_stripped', 'MJD', 'FIBERID', 'PLATE']]
+seyfertsvot=seyfertsvot.rename(columns={"ra_x": "ra", "dec_x": "dec", "IAU_stripped": "IAUstripped"})
+table = Table.from_pandas(seyfertsvot)
 table.write('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.vot', overwrite=True,format='votable')
 
 #Those that are fully unclassified by both agostino and portsmouth

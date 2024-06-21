@@ -7,7 +7,7 @@ query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/XMM_query.txt"
 table="/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.vot"
 
 # Read the query from query.txt, changing new lines and tabs to spaces
-query=$(cat "$query_file" | tr '\n\t' ' ')
+query=$(tr -s '[:space:]' ' ' < "$query_file")
 
 # Execute the curl command
 curl -i -X POST \
@@ -17,7 +17,7 @@ curl -i -X POST \
     --form LANG=ADQL \
     --form FORMAT=votable \
     --form REQUEST=doQuery \
-    --form QUERY="$query" \
+    --form QUERY="\"$query\"" \
     "https://nxsa.esac.esa.int/tap-server/tap/async"
 
 # After running this script, the request lists a location 
