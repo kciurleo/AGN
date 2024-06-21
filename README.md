@@ -15,7 +15,7 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `find_obsid_given_name.sh` takes in a file with IAU names, then spits out a new file with the chandra OBSIDs (and dates and lengths/times) for those objects.
 
-`move_dir.sh` takes in a file with obsid names, then moves them from one directory to another, given they exist.
+`move_dir.sh` and `move_dir_multiple` take in a file with obsid names, then move them from one directory to another, given they exist. The latter checks multiple directories for the given obsid names.
 
 ### Other Folders
 
