@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # This script runs an asynchronous post request based on a query txt file, input votable, and API endpoint. 
-# Used for both XMM and eROSITA query
+# Used for both XMM and eROSITA query; eROSITA query did not end up working.
 
 # Files
-#query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/XMM_query.txt"
-query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/eROSITA_query.txt"
-#endpoint="https://nxsa.esac.esa.int/tap-server/tap/async"
-endpoint="https://heasarc.gsfc.nasa.gov/xamin/vo/tap/async"
+query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/XMM_query.txt"
+#query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/eROSITA_query.txt"
+endpoint="https://nxsa.esac.esa.int/tap-server/tap/async"
+#endpoint="https://heasarc.gsfc.nasa.gov/xamin/vo/tap/async"
 table="/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.vot"
 
 # Read the query from query.txt, changing new lines and tabs to spaces
