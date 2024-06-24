@@ -1,0 +1,7 @@
+SELECT 
+    er.ra,er.dec,er.obsid,er.name,
+    my_cat.ra,my_cat.dec,my_cat.IAUstripped,my_cat.MJD,my_cat.FIBERID,my_cat.PLATE
+FROM 
+    erosmaster AS er
+JOIN 
+    TAP_UPLOAD.table_f AS my_cat ON 1=contains(point('ICRS',er.ra,er.dec),circle('ICRS',my_cat.ra,my_cat.dec,10./3600.))
