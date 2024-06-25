@@ -63,10 +63,6 @@ plt.xticks(ticks=np.radians([-150, -120, -90, -60, -30, 0, \
            labels=['30°', '60°', '90°', '120°', '150°', '180°', \
                    '210°', '240°', '270°', '300°', '330°'])
 
-ax.yaxis.set_tick_params(which='both', colors='black')
-for label in ax.yaxis.get_ticklabels():
-    label.set_color('black')
-
 plt.grid()
 plt.legend(loc="upper right")
 
