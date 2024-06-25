@@ -14,6 +14,12 @@ full_point_sources=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/full
 portsmouth_s2=full_point_sources.loc[full_point_sources['bpt']=="Seyfert"]
 agostino_s2=full_point_sources.loc[full_point_sources['sl_class1']==1]
 
+#Find starforming galaxies, bpt="Star Forming" or "Star Fo", Agostino general emission line classification = 1 star forming, = 4 is "more likely star forming than S/L"
+starforming=full_point_sources.loc[(full_point_sources['bpt']=="Star Forming") | (full_point_sources['bpt']=="Star Fo") | (full_point_sources['gen_el_class']==1) | (full_point_sources['gen_el_class']==4)]
+
+#Find composite galaxies, only identified by Portsmouth
+composite=full_point_sources.loc[(full_point_sources['bpt']=="Composite") | (full_point_sources['bpt']=="Composi")]
+
 #Ke01 SFR cutoffs from Kewley et al. (2006)
 kxNII=np.linspace(-4,0.4,1000)
 ke01NII=0.61/(kxNII-0.47)+1.19
@@ -39,8 +45,10 @@ slOI=1.18*slxOI+1.3
 plt.figure(figsize=(6,6))
 
 plt.scatter(np.log10(full_point_sources['Flux_NII_6583']/full_point_sources['Flux_Ha_6562']),np.log10(full_point_sources['Flux_OIII_5006']/full_point_sources['Flux_Hb_4861']), s=3,c='gray',marker='.', alpha=0.5, label='CSC Point Sources')
-plt.scatter(np.log10(agostino_s2['Flux_NII_6583']/agostino_s2['Flux_Ha_6562']),np.log10(agostino_s2['Flux_OIII_5006']/agostino_s2['Flux_Hb_4861']), marker='.', s=3, c='blue', label='Agostino')
-plt.scatter(np.log10(portsmouth_s2['Flux_NII_6583']/portsmouth_s2['Flux_Ha_6562']),np.log10(portsmouth_s2['Flux_OIII_5006']/portsmouth_s2['Flux_Hb_4861']), marker='.', s=3, c='red', label='Portsmouth')
+plt.scatter(np.log10(composite['Flux_NII_6583']/composite['Flux_Ha_6562']),np.log10(composite['Flux_OIII_5006']/composite['Flux_Hb_4861']), s=3,c='green',marker='.', alpha=0.5, label='Composites')
+plt.scatter(np.log10(starforming['Flux_NII_6583']/starforming['Flux_Ha_6562']),np.log10(starforming['Flux_OIII_5006']/starforming['Flux_Hb_4861']), s=3,c='yellow',marker='.', alpha=0.5, label='Star-Forming')
+plt.scatter(np.log10(agostino_s2['Flux_NII_6583']/agostino_s2['Flux_Ha_6562']),np.log10(agostino_s2['Flux_OIII_5006']/agostino_s2['Flux_Hb_4861']), marker='.', s=3, c='blue', label='Agostino Seyferts')
+plt.scatter(np.log10(portsmouth_s2['Flux_NII_6583']/portsmouth_s2['Flux_Ha_6562']),np.log10(portsmouth_s2['Flux_OIII_5006']/portsmouth_s2['Flux_Hb_4861']), marker='.', s=3, c='red', label='Portsmouth Seyferts')
 plt.plot(kxNII, ke01NII, color='black', linestyle='dashed',label='Ke01')
 plt.plot(kaxNII, ka03NII, color='black', linestyle='dotted',label='Ka03')
 
