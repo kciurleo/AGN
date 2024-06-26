@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # This script runs an asynchronous post request based on a query txt file, input votable, and API endpoint. 
-# Used for both XMM and eROSITA query; eROSITA query did not end up working.
+# Used for both XMM and eROSITA query; eROSITA query did not end up working and used TOPCAT instead.
 
 # Files
 query_file="/Users/kciurleo/Documents/kciurleo/AGN/queries/XMM_query.txt"
