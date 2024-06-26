@@ -40,28 +40,33 @@ equatorial_coords = galactic_coords.transform_to('fk5')
 RA = equatorial_coords.ra.degree
 Dec = equatorial_coords.dec.degree
 
+#Flip RA axis
+def flip(ra):
+    #flips map's RA coordinate
+    return(-ra)
+
 #Make plot
 fig = plt.figure(figsize=(16,10))
 plt.style.use('dark_background')
 ax = fig.add_subplot(111, projection="aitoff")
 
 #eROSITA
-ax.plot(np.radians(RA-180), np.radians(Dec), '.',markersize=1, color='yellow')
-ax.plot(np.radians(RA-360), -np.radians(Dec), '.',markersize=1, color='yellow', label='eROSITA Boundary')
+ax.plot(flip(np.radians(RA-180)), np.radians(Dec), '.',markersize=1, color='yellow')
+ax.plot(flip(np.radians(RA-360)), -np.radians(Dec), '.',markersize=1, color='yellow', label='eROSITA Boundary')
 #weird connecting line
-ax.plot([np.radians(RA[-1]-180), np.radians(RA[150]-360)],[np.radians(Dec[-1]), -np.radians(Dec[150])],color='yellow', linestyle='-')
+ax.plot(flip(np.array([np.radians(RA[-1]-180), np.radians(RA[150]-360)])),[np.radians(Dec[-1]), -np.radians(Dec[150])],color='yellow', linestyle='-')
 
 
 for i in range(len(ras)):
-    ax.scatter(np.radians(ras[i]-180), np.radians(decs[i]),marker=markers[i],c=colors[i], s=sizes[i], label=labels[i], alpha=alphas[i], linewidths=1)
-#plot twice because it doesn't like to do that
+    ax.scatter(flip(np.radians(ras[i]-180)), np.radians(decs[i]),marker=markers[i],c=colors[i], s=sizes[i], label=labels[i], alpha=alphas[i], linewidths=1)
+#plot twice for all the shifting
 for i in range(len(ras)):
-    ax.scatter(np.radians(ras[i]-360-180), np.radians(decs[i]),marker=markers[i],c=colors[i], s=sizes[i], alpha=alphas[i], linewidths=0.5)
+    ax.scatter(flip(np.radians(ras[i]-360-180)), np.radians(decs[i]),marker=markers[i],c=colors[i], s=sizes[i], alpha=alphas[i], linewidths=0.5)
 
-plt.xticks(ticks=np.radians([-150, -120, -90, -60, -30, 0, \
-                             30, 60, 90, 120, 150]),
-           labels=['30°', '60°', '90°', '120°', '150°', '180°', \
-                   '210°', '240°', '270°', '300°', '330°'])
+plt.xticks(ticks=np.radians([-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]),
+           #for unflipped
+           #labels=['30°', '60°', '90°', '120°', '150°', '180°', '210°', '240°', '270°', '300°', '330°'])
+           labels=['330°', '300°', '270°', '240°',  '210°', '180°', '150°', '120°', '90°','60°', '30°'])
 
 plt.grid()
 plt.legend(loc="upper right")
