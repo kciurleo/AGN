@@ -7,7 +7,7 @@
 
 #DONT RUN THIS CODE SOMETHING IS MAJORLY WRONG
 
-spectra="/Users/kciurleo/Documents/kciurleo/AGN/queries/SDSS.txt"
+spectra="/Users/kciurleo/Documents/kciurleo/AGN/csvs/SDSS.txt"
 directory="/Volumes/galaxies/Katie/SDSS_data/"
 
 cd "$directory"
