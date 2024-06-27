@@ -4,7 +4,7 @@
 # This version accounts for the possibility that the file is in two places, and skips the copying
 # if the file already exists at the end directory.
 
-input_file="/Users/kciurleo/Downloads/seths_obsids.txt"
+input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/seth_final_obsids.txt"
 
 # Directories
 start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
@@ -15,6 +15,9 @@ end_dir="/Volumes/galaxies/rerunning_seth/data"
 directory_exists() {
     [ -d "$1" ]
 }
+
+# Unfound directories
+unfound=()
 
 # Copy entire directories
 while read F  ; do
@@ -29,6 +32,12 @@ while read F  ; do
             echo "Copied $F from $start_dir2"
         else
             echo "Directory $F not found in either $start_dir1 or $start_dir2"
+            unfound+=("$F")
         fi
     fi
 done < "$input_file"
+
+echo "Not found in either directory: "
+for dir in "${not_found_directories[@]}"; do
+        echo "$dir"
+done
