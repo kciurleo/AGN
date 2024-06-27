@@ -9,6 +9,10 @@ input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/seth_final_obsids
 # Directories
 start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
 start_dir2="/Volumes/galaxies/Seth/AGNs/x-ray/csc_v2/"
+#start_dir3="/Volumes/galaxies/Seth/AGNs/x-ray/archive/all_sources/"
+#start_dir3="/Volumes/galaxies/Seth/AGNs/x-ray/archive/old/"
+#start_dir3="/Volumes/galaxies/Seth/AGNs/x-ray/archive/data_dir_old/"
+start_dir3="/Volumes/galaxies/Katie/xray_data/"
 end_dir="/Volumes/galaxies/rerunning_seth/data"
 
 # Function to check if directory exists
@@ -30,14 +34,17 @@ while read F  ; do
         elif directory_exists "$start_dir2$F"; then
             cp -r "$start_dir2$F" "$end_dir"
             echo "Copied $F from $start_dir2"
+        elif directory_exists "$start_dir3$F"; then
+            cp -r "$start_dir3$F" "$end_dir"
+            echo "Copied $F from $start_dir3"
         else
-            echo "Directory $F not found in either $start_dir1 or $start_dir2"
+            echo "Directory $F not found in either $start_dir1 or $start_dir2 or $start_dir3"
             unfound+=("$F")
         fi
     fi
 done < "$input_file"
 
-echo "Not found in either directory: "
-for dir in "${not_found_directories[@]}"; do
+echo "${#unfound[@]} items not found in either directory: "
+for dir in "${unfound[@]}"; do
         echo "$dir"
 done
