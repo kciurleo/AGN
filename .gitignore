@@ -43,3 +43,7 @@ venv.bak/
 .DS_Store 
 
 */SciScript-Python/*
+
+#fits data for testing sherpa_fitting_code
+/sherpa_fitting_code/data/
+/sherpa_fitting_code/*.log

@@ -10,7 +10,7 @@ input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/seth_final_obsids
 start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
 start_dir2="/Volumes/galaxies/Seth/AGNs/x-ray/csc_v2/"
 start_dir3="/Volumes/galaxies/Katie/xray_data/"
-end_dir="/Volumes/lif-astro1.wesleyan.edu/astro_pwdata/katie/data/"
+end_dir="/opt/katie/data/"
 
 # Function to check if directory exists
 directory_exists() {
