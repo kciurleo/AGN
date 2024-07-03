@@ -9,11 +9,8 @@ input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/seth_final_obsids
 # Directories
 start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
 start_dir2="/Volumes/galaxies/Seth/AGNs/x-ray/csc_v2/"
-#start_dir3="/Volumes/galaxies/Seth/AGNs/x-ray/archive/all_sources/"
-#start_dir3="/Volumes/galaxies/Seth/AGNs/x-ray/archive/old/"
-#start_dir3="/Volumes/galaxies/Seth/AGNs/x-ray/archive/data_dir_old/"
 start_dir3="/Volumes/galaxies/Katie/xray_data/"
-end_dir="/Volumes/galaxies/rerunning_seth/data"
+end_dir="/Volumes/lif-astro1.wesleyan.edu/astro_pwdata/katie/data/"
 
 # Function to check if directory exists
 directory_exists() {
@@ -25,7 +22,7 @@ unfound=()
 
 # Copy entire directories
 while read F  ; do
-    if directory_exists "$end_dir/$F"; then
+    if directory_exists "$end_dir$F"; then
         echo "$F already exists in $end_dir, skipping."
     else
         if directory_exists "$start_dir1$F"; then
