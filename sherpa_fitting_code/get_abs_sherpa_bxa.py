@@ -148,15 +148,31 @@ def get_abs(nH,z,dir):
     flux210_error_minus = abs(flux210_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
 
 
+    #2 to 10 KeV flux
+    mdlsoft = f'xscflux.fsoft({mdl})'
+    set_full_model(1, get_bkg_model(1)*get_bkg_scale(1)+get_response(1)(mdlsoft))
+    f210.Emin = 0.2
+    f210.Emax = 0.6
 
+    fit()
+    #get value and covar of f210
+    fluxsoft_value = 10**(fsoft.lg10Flux.val)
+    covariance()
+    covar = get_covar_results()
+    covar = str(covar).split('\n')
+    upper_error = covar[10].strip('parmaxes     = (').rstrip(')').rstrip(',')
+    lower_error = covar[9].strip('parmins     = (').rstrip(')').rstrip(',')
+    fluxsoft_error_plus = abs((10 **  (fx.lg10Flux.val + float(upper_error))) - fluxsoft_value)
+    fluxsoft_error_minus = abs(fluxsoft_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
 
     #write out the fluxes
     Xflux= f"{Xflux_value} {Xflux_error_plus} {Xflux_error_minus}"
     flux_210 = f"{flux210_value} {flux210_error_plus} {flux210_error_minus}"
+    flux_soft = f"{fluxsoft_value} {fluxsoft_error_plus} {fluxsoft_error_minus}"
 
 
     #Format the string that will be written to the file
-    out = f'#CSTAT:\n{cstat}\nnH:\n{local_nH}\nERROR:\n{nH_err}\nGamma:\n{gamma}\nERROR:\n{gamma_err}\n0.3-7.5 Flux:\n{Xflux}\n2-10 Flux:\n{flux_210}\nTest statistic:\n{stat}\nCe:\n{Ce}\nCv:\n{Cv}\ndof:\n{dof}'
+    out = f'#CSTAT:\n{cstat}\nnH:\n{local_nH}\nERROR:\n{nH_err}\nGamma:\n{gamma}\nERROR:\n{gamma_err}\n0.3-7.5 Flux:\n{Xflux}\n2-10 Flux:\n{flux_210}\nTest statistic:\n{stat}\nCe:\n{Ce}\nCv:\n{Cv}\ndof:\n{dof}\nSoft 0.2-0.6 Flux:\n{flux_soft}'
 
     #save the session
     save(filename=f'{dir}/get_abs.save', clobber=True)
