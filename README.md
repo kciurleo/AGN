@@ -62,10 +62,18 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `XMM_query_result.vot` is the downloaded result of the cone search of XMM around the candidates described by `post_async.sh`, with a search radius of 10".
 
+`koulouridis.csv` and `koulouridis_coordinates.csv` are identical sets of Seyfert 2 AGN identified by [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) using XMM and were used to query ChaSer for matching observations. The latter contains only the RA and Dec columns needed for such a query.
+
+### sherpa_fitting_code
+
+This code collects all the files relevant to Seth Larner's full process of finding unabsorbed Seyfert 2 AGN. See `README.txt` for instructions on how to run the code, as well as `full_process_sherpa_bxa.py` for the main body of the code. 
+
+His initial version required the use of ChaSer to download all the data and spit out a table with information about each obsid, but since I downloaded files differently, references to ChaSer have either been edited or commented out. Before tracking with this repository, any edits made by me were marked and commented; since then, version control has been handled by GitHub.
+
 ### Other Folders
 
 `queries` contains various SQL queries for crossmatching with SDSS and XMM.
 
 `plots` contains output plots and figures.
 
-`unorganized` contains code that is either in progress or yet to be sorted.
+`unorganized` contains code that is either in progress or yet to be sorted, including trying to figure out Seth Larner's pipeline, getting information about XMM and eROSITA cone searches, and comparing sets of data.
