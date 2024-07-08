@@ -852,7 +852,7 @@ def main():
     '''
     data_full_collated = np.column_stack((data_full_collated,full_lum_arr,full_lum_err_arr))
 
-    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'
+    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'
     #End temporary edit
     
     #Edited 7/3/2024
@@ -904,7 +904,7 @@ def main():
     '''
     data_full_collated_min_abs = np.column_stack((data_full_collated_min_abs,min_lum_arr,min_lum_err_arr))
 
-    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'       
+    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'       
     #End temporary edit
     
     np.savetxt(f'{min_abs_dir}/{outroot_text}_min_abs_allinfo_full_withratio.csv',data_full_collated_min_abs,fmt='%s',delimiter=',',header=header)
