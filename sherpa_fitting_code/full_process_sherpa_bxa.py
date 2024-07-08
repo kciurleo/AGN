@@ -271,7 +271,7 @@ def main():
     #check and make sure inputs are valid
     if 'n' in wav_clobber:
         wav_clobber = 'no'
-    elif 'y' in spec_clobber:
+    elif 'y' in wav_clobber:
         wav_clobber = 'yes'
     else:
         sys.exit('Wavdetect clobber not recognized')

@@ -148,14 +148,14 @@ def get_abs(nH,z,dir):
     flux210_error_minus = abs(flux210_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
 
 
-    #2 to 10 KeV flux
+    #eROSITA 'soft' flux
     mdlsoft = f'xscflux.fsoft({mdl})'
     set_full_model(1, get_bkg_model(1)*get_bkg_scale(1)+get_response(1)(mdlsoft))
-    f210.Emin = 0.2
-    f210.Emax = 0.6
+    fsoft.Emin = 0.2
+    fsoft.Emax = 0.6
 
     fit()
-    #get value and covar of f210
+    #get value and covar of fsoft
     fluxsoft_value = 10**(fsoft.lg10Flux.val)
     covariance()
     covar = get_covar_results()
@@ -165,14 +165,68 @@ def get_abs(nH,z,dir):
     fluxsoft_error_plus = abs((10 **  (fx.lg10Flux.val + float(upper_error))) - fluxsoft_value)
     fluxsoft_error_minus = abs(fluxsoft_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
 
+    #eROSITA 'medium' flux
+    mdlmed = f'xscflux.fmed({mdl})'
+    set_full_model(1, get_bkg_model(1)*get_bkg_scale(1)+get_response(1)(mdlmed))
+    fmed.Emin = 0.6
+    fmed.Emax = 2.3
+
+    fit()
+    #get value and covar of fmed
+    fluxmed_value = 10**(fmed.lg10Flux.val)
+    covariance()
+    covar = get_covar_results()
+    covar = str(covar).split('\n')
+    upper_error = covar[10].strip('parmaxes     = (').rstrip(')').rstrip(',')
+    lower_error = covar[9].strip('parmins     = (').rstrip(')').rstrip(',')
+    fluxmed_error_plus = abs((10 **  (fx.lg10Flux.val + float(upper_error))) - fluxmed_value)
+    fluxmed_error_minus = abs(fluxmed_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
+
+    #eROSITA 'hard' flux
+    mdlhard = f'xscflux.fhard({mdl})'
+    set_full_model(1, get_bkg_model(1)*get_bkg_scale(1)+get_response(1)(mdlhard))
+    fhard.Emin = 2.3
+    fhard.Emax = 5.0
+
+    fit()
+    #get value and covar of fhard
+    fluxhard_value = 10**(fhard.lg10Flux.val)
+    covariance()
+    covar = get_covar_results()
+    covar = str(covar).split('\n')
+    upper_error = covar[10].strip('parmaxes     = (').rstrip(')').rstrip(',')
+    lower_error = covar[9].strip('parmins     = (').rstrip(')').rstrip(',')
+    fluxhard_error_plus = abs((10 **  (fx.lg10Flux.val + float(upper_error))) - fluxhard_value)
+    fluxhard_error_minus = abs(fluxhard_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
+    
+    #eROSITA 'summed' flux
+    mdlsum = f'xscflux.fsum({mdl})'
+    set_full_model(1, get_bkg_model(1)*get_bkg_scale(1)+get_response(1)(mdlsum))
+    fsum.Emin = 0.2
+    fsum.Emax = 5.0
+
+    fit()
+    #get value and covar of fsoft
+    fluxsum_value = 10**(fsum.lg10Flux.val)
+    covariance()
+    covar = get_covar_results()
+    covar = str(covar).split('\n')
+    upper_error = covar[10].strip('parmaxes     = (').rstrip(')').rstrip(',')
+    lower_error = covar[9].strip('parmins     = (').rstrip(')').rstrip(',')
+    fluxsum_error_plus = abs((10 **  (fx.lg10Flux.val + float(upper_error))) - fluxsum_value)
+    fluxsum_error_minus = abs(fluxsum_value - (10 **  (fx.lg10Flux.val - float(lower_error))))
+
     #write out the fluxes
     Xflux= f"{Xflux_value} {Xflux_error_plus} {Xflux_error_minus}"
     flux_210 = f"{flux210_value} {flux210_error_plus} {flux210_error_minus}"
     flux_soft = f"{fluxsoft_value} {fluxsoft_error_plus} {fluxsoft_error_minus}"
+    flux_med = f"{fluxmed_value} {fluxmed_error_plus} {fluxmed_error_minus}"
+    flux_hard = f"{fluxhard_value} {fluxhard_error_plus} {fluxhard_error_minus}"
+    flux_sum = f"{fluxsum_value} {fluxsum_error_plus} {fluxsum_error_minus}"
 
 
     #Format the string that will be written to the file
-    out = f'#CSTAT:\n{cstat}\nnH:\n{local_nH}\nERROR:\n{nH_err}\nGamma:\n{gamma}\nERROR:\n{gamma_err}\n0.3-7.5 Flux:\n{Xflux}\n2-10 Flux:\n{flux_210}\nTest statistic:\n{stat}\nCe:\n{Ce}\nCv:\n{Cv}\ndof:\n{dof}\nSoft 0.2-0.6 Flux:\n{flux_soft}'
+    out = f'#CSTAT:\n{cstat}\nnH:\n{local_nH}\nERROR:\n{nH_err}\nGamma:\n{gamma}\nERROR:\n{gamma_err}\n0.3-7.5 Flux:\n{Xflux}\n2-10 Flux:\n{flux_210}\nTest statistic:\n{stat}\nCe:\n{Ce}\nCv:\n{Cv}\ndof:\n{dof}\nSoft 0.2-0.6 Flux:\n{flux_soft}\nMedium 0.6-2.3 Flux:\n{flux_med}\nHard 2.3-5.0 Flux:\n{flux_hard}\nSummed 0.2-5 Flux:\n{flux_sum}'
 
     #save the session
     save(filename=f'{dir}/get_abs.save', clobber=True)
