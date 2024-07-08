@@ -7,7 +7,7 @@
 
 #modified to work with the full process program
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus'
+header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,soft flux,fluxsoft error plus,fluxsoft error minus,med flux,fluxmed error plus,fluxmed error minus,hard flux,fluxhard error plus,fluxhard error minus,sum flux,fluxsum error plus,fluxsum error minus'
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -67,6 +67,18 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
     flux210_values = []
     flux210_error_ups = []
     flux210_error_downs = []
+    fluxsoft_values = []
+    fluxsoft_error_ups = []
+    fluxsoft_error_downs = []
+    fluxmed_values = []
+    fluxmed_error_ups = []
+    fluxmed_error_downs = []
+    fluxhard_values = []
+    fluxhard_error_ups = []
+    fluxhard_error_downs = []
+    fluxsum_values = []
+    fluxsum_error_ups = []
+    fluxsum_error_downs = []
     test_stat_values = []
     ce_values = []
     cv_values = []
@@ -76,6 +88,10 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
         gamma_failed = False
         xflux_failed = False
         flux210_failed = False
+        fluxsoft_failed = False
+        fluxmed_failed = False
+        fluxhard_failed = False
+        fluxsum_failed = False
         all_failed = False
 
         dir = f'{data_dir}/{obsid}/primary'
@@ -195,6 +211,94 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
             flux210_error_downs.append(flux210_error_down)
             flux210_error_ups.append(flux210_error_up)
 
+            #read the 'soft' fluxes
+            if not all_failed:
+                try:
+                    fluxsoft = summary_list[23].split()[0]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsoft = 'ERROR'
+                    fluxsoft_error_up = 'ERROR'
+                    fluxsoft_error_down = 'ERROR'
+                    fluxsoft_failed = True
+            if not fluxsoft_failed:
+                try:
+                    fluxsoft_error_down = summary_list[23].split()[1]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsoft_error_down = 'ERROR'
+                try:
+                    fluxsoft_error_up = summary_list[23].split()[2]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsoft_error_up = 'ERROR'
+            fluxsoft_values.append(fluxsoft)
+            fluxsoft_error_downs.append(fluxsoft_error_down)
+            fluxsoft_error_ups.append(fluxsoft_error_up)
+
+            #read the 'medium' fluxes
+            if not all_failed:
+                try:
+                    fluxmed = summary_list[25].split()[0]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxmed = 'ERROR'
+                    fluxmed_error_up = 'ERROR'
+                    fluxmed_error_down = 'ERROR'
+                    fluxmed_failed = True
+            if not fluxmed_failed:
+                try:
+                    fluxmed_error_down = summary_list[25].split()[1]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxmed_error_down = 'ERROR'
+                try:
+                    fluxmed_error_up = summary_list[25].split()[2]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxmed_error_up = 'ERROR'
+            fluxmed_values.append(fluxmed)
+            fluxmed_error_downs.append(fluxmed_error_down)
+            fluxmed_error_ups.append(fluxmed_error_up)
+
+            #read the 'hard' fluxes
+            if not all_failed:
+                try:
+                    fluxhard = summary_list[27].split()[0]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxhard = 'ERROR'
+                    fluxhard_error_up = 'ERROR'
+                    fluxhard_error_down = 'ERROR'
+                    fluxhard_failed = True
+            if not fluxhard_failed:
+                try:
+                    fluxhard_error_down = summary_list[27].split()[1]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxhard_error_down = 'ERROR'
+                try:
+                    fluxhard_error_up = summary_list[27].split()[2]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsoft_error_up = 'ERROR'
+            fluxhard_values.append(fluxhard)
+            fluxhard_error_downs.append(fluxhard_error_down)
+            fluxhard_error_ups.append(fluxhard_error_up)
+
+            #read the 'summed' fluxes
+            if not all_failed:
+                try:
+                    fluxsum = summary_list[29].split()[0]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsum = 'ERROR'
+                    fluxsum_error_up = 'ERROR'
+                    fluxsum_error_down = 'ERROR'
+                    fluxsum_failed = True
+            if not fluxsum_failed:
+                try:
+                    fluxsum_error_down = summary_list[29].split()[1]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsum_error_down = 'ERROR'
+                try:
+                    fluxsum_error_up = summary_list[29].split()[2]
+                except (IndexError, TypeError, FileNotFoundError, ValueError) as e:
+                    fluxsum_error_up = 'ERROR'
+            fluxsum_values.append(fluxsum)
+            fluxsum_error_downs.append(fluxsum_error_down)
+            fluxsum_error_ups.append(fluxsum_error_up)
+
             #read the test statistics
             if not all_failed:
                 try:
@@ -220,8 +324,8 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
     if min_abs:
         csv_out = np.column_stack((min_abs_list,stat_values,nH_values,nH_error_ups,nH_error_downs,gamma_values,gamma_error_ups,gamma_error_downs,xflux_values,xflux_error_ups,xflux_error_downs,flux210_values,flux210_error_ups,flux210_error_downs, test_stat_values, ce_values, cv_values))
     else:
-        csv_out = np.column_stack((in_list,stat_values,nH_values,nH_error_ups,nH_error_downs,gamma_values,gamma_error_ups,gamma_error_downs,xflux_values,xflux_error_ups,xflux_error_downs,flux210_values,flux210_error_ups,flux210_error_downs, test_stat_values, ce_values, cv_values))
-    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Test Statistic,Ce,Cv'
+        csv_out = np.column_stack((in_list,stat_values,nH_values,nH_error_ups,nH_error_downs,gamma_values,gamma_error_ups,gamma_error_downs,xflux_values,xflux_error_ups,xflux_error_downs,flux210_values,flux210_error_ups,flux210_error_downs,fluxsoft_values,fluxsoft_error_ups,fluxsoft_error_downs,fluxmed_values,fluxmed_error_ups,fluxmed_error_downs,fluxhard_values,fluxhard_error_ups,fluxhard_error_downs,fluxsum_values,fluxsum_error_ups,fluxsum_error_downs, test_stat_values, ce_values, cv_values))
+    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,soft flux,fluxsoft error plus,fluxsoft error minus,med flux,fluxmed error plus,fluxmed error minus,hard flux,fluxhard error plus,fluxhard error minus,sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv'
 
     if write_out:
         if min_abs:
@@ -240,7 +344,7 @@ def collate(data_dir,outroot,chaser_path,min_abs_tf):
     #min_abs_dir = f'{outroot}_min_abs'
     min_abs_dir = f'{outroot}/min_abs'
     #End edit
-    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Test Statistic,Ce,Cv'
+    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,soft flux,fluxsoft error plus,fluxsoft error minus,med flux,fluxmed error plus,fluxmed error minus,hard flux,fluxhard error plus,fluxhard error minus,sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv'
     alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
     outroot_text = outroot.split('/')[-1]
 

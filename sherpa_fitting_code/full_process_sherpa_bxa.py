@@ -764,7 +764,7 @@ def main():
             try:
                 print(fit_clobber)
                 if fit_clobber == 'yes' or not already_fit:
-                    'Im doin it'
+                    print('Im doin it')
                     get_abs(n,z,dir)
                     get_abs_alt(n,z,dir)
                     get_abs_restricted(n,z,dir)
@@ -852,7 +852,7 @@ def main():
     '''
     data_full_collated = np.column_stack((data_full_collated,full_lum_arr,full_lum_err_arr))
 
-    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'
+    header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Soft flux,fluxsoft error plus,fluxsoft error minus,Medium flux,fluxmed error plus,fluxmed error minus,Hard flux,fluxhard error plus,fluxhard error minus,Sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'
     #End temporary edit
     
     #Edited 7/3/2024
