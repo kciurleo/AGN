@@ -32,9 +32,19 @@ def is_unique(list):
 
 #examine logs reads the logs for the sources it is given and makes an array of the
 #properites contained within
-def examine_logs(min_abs,write_out,data_dir,outroot):
+def examine_logs(min_abs,write_out,data_dir,outroot, model=''):
     min_abs_list = []
     outroot_text = outroot.split('/')[-1]
+    #Assumes model is the primary, but can accomodate alt/restricted models
+    if model == 'alt' or model == 'alternate':
+        model_ending_1 = '_alt'
+        model_ending_2 = '_alt'
+    elif model == 'res' or model == 'restricted':
+        model_ending_1 = '_res'
+        model_ending_2 = '_restricted'
+    else:
+        model_ending_1, model_ending_2='', ''
+
     #min_abs controls if the process is applied to the unabsorbed sources (true) or all (false)
     #write_out controls if the csvs are made
     #probably shouldn't be right now, but its there if you want it
@@ -42,7 +52,7 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
 
     #Edited 7/3/2024
     #min_abs_dir = f'{outroot}_min_abs'
-    min_abs_dir = f'{outroot}/min_abs'
+    min_abs_dir = f'{outroot}/min_abs{model_ending_1}'
     #End edit
     try: #don't want to error out if the directory already exists
         os.system(f'mkdir {min_abs_dir}')
@@ -96,7 +106,7 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
 
         dir = f'{data_dir}/{obsid}/primary'
         try:
-            with open(f'{data_dir}/{obsid}/primary/sherpaout.txt','r') as out:
+            with open(f'{data_dir}/{obsid}/primary/sherpaout{model_ending_2}.txt','r') as out:
                 summary_list = out.read().split('\n')
         except FileNotFoundError:
             summary_list = 'p' #give this a nonsense value so that it trips the excepts and properly documents errors
@@ -329,20 +339,27 @@ def examine_logs(min_abs,write_out,data_dir,outroot):
 
     if write_out:
         if min_abs:
-            np.savetxt(f'{min_abs_dir}/{outroot_text}_allinfo.csv',csv_out,fmt='%s',delimiter=',',header=header)
+            np.savetxt(f'{min_abs_dir}/{outroot_text}_allinfo{model_ending_1}.csv',csv_out,fmt='%s',delimiter=',',header=header)
         else:
             #Edited 7/3/2024
             #np.savetxt(f'{outroot}_allinfo.csv',csv_out,fmt='%s',delimiter=',',header=header)
-            np.savetxt(f'{outroot}/allinfo.csv',csv_out,fmt='%s',delimiter=',',header=header)
+            np.savetxt(f'{outroot}/allinfo{model_ending_1}.csv',csv_out,fmt='%s',delimiter=',',header=header)
             #End edit
 
     return csv_out
 
 
-def collate(data_dir,outroot,chaser_path,min_abs_tf):
+def collate(data_dir,outroot,chaser_path,min_abs_tf, model=''):
+    if model == 'alt' or model == 'alternate':
+        model_ending_1 = '_alt'
+    elif model == 'res' or model == 'restricted':
+        model_ending_1 = '_res'
+    else:
+        model_ending_1 = ''
+
     #Edited 7/3/2024
     #min_abs_dir = f'{outroot}_min_abs'
-    min_abs_dir = f'{outroot}/min_abs'
+    min_abs_dir = f'{outroot}/min_abs{model_ending_1}'
     #End edit
     header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,soft flux,fluxsoft error plus,fluxsoft error minus,med flux,fluxmed error plus,fluxmed error minus,hard flux,fluxhard error plus,fluxhard error minus,sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv'
     alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
@@ -381,7 +398,7 @@ def collate(data_dir,outroot,chaser_path,min_abs_tf):
 
 
     print('Reading logs...')
-    csv_out = examine_logs(min_abs_tf,True,data_dir,outroot)
+    csv_out = examine_logs(min_abs_tf,True,data_dir,outroot, model)
 
     read_obsids = csv_out[::,0]
     if read_obsids[-1] == '':
@@ -465,11 +482,11 @@ def collate(data_dir,outroot,chaser_path,min_abs_tf):
     #End edit
 
     if min_abs_tf:
-        np.savetxt(f'{min_abs_dir}/{outroot_text}_min_abs_allinfo_full.csv',final_csv,fmt='%s',delimiter=',',header=header)
+        np.savetxt(f'{min_abs_dir}/{outroot_text}_min_abs_allinfo_full{model_ending_1}.csv',final_csv,fmt='%s',delimiter=',',header=header)
     else:
         #Edited 7/3/2024
         #np.savetxt(f'{outroot}_allinfo_full.csv',final_csv,fmt='%s',delimiter=',',header=header)
-        np.savetxt(f'{outroot}/allinfo_full.csv',final_csv,fmt='%s',delimiter=',',header=header)
+        np.savetxt(f'{outroot}/allinfo_full{model_ending_1}.csv',final_csv,fmt='%s',delimiter=',',header=header)
         #End edit
 
     return final_csv
@@ -480,13 +497,14 @@ if __name__ == '__main__':
 
     if len(sys.argv) != 5:
         print(f'''Inputs not recognized
-    Try: python {sys.argv[0]} [data_dir] [outroot] [chaser_path] [min_abs?]''')
+    Try: python {sys.argv[0]} [data_dir] [outroot] [chaser_path] [min_abs?] [model]''')
         raise Exception
 
     data_dir = sys.argv[1]
     outroot = sys.argv[2]
     outroot_text = outroot.split('/')[-1]
     chaser_path = sys.argv[3]
+    model = sys.argv[5]
 
     if 't' in sys.argv[4]:
         min_abs_tf = True
