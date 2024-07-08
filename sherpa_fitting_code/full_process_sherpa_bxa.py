@@ -18,6 +18,7 @@ from compton_check_for_fp import lookup_oiii, calc_ratio
 from calc_cosmos_for_fp import cosmo_calc
 from get_abs_sherpa_bxa_alt import get_abs_alt
 from get_abs_sherpa_bxa_restricted import get_abs_restricted
+from make_stat_table import *
 
 xspec_init_command = 'hea'
 xspec_start_command = 'xspec'
@@ -919,6 +920,21 @@ def main():
         
         np.savetxt(f'{min_abs_dir}/{outroot_text}_min_abs_allinfo_full_withratio{model_ending_1}.csv',data_full_collated_min_abs,fmt='%s',delimiter=',',header=header)
 
+
+    ####################
+    #Make the stats table
+    print('Making Stat Table')
+    obsid_data = np.loadtxt(f'{outroot}/allinfo_full_withratio.csv',dtype='str',delimiter=',')[::,0]
+
+    out = make_spreadsheet(data_dir,obsid_data)
+    statsheader = 'obsid,Ce,Cv,DOF,stat'
+    statsheader += ',Ce restricted,Cv restricted,DOF restricted,stat restricted'
+    statsheader += ',Ce alt,Cv alt,DOF alt,stat alt'
+    statsheader += ',P(alt vs main),P(main vs res),P(alt vs res)'
+    np.savetxt(f'{outroot}/stats.csv',out,fmt='%s',delimiter = ',',header = statsheader)
+
+    ####################
+    #BEST_MODEL.PY
 
     print('Finished')
     print('Examine error logs for errors encountered')

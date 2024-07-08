@@ -111,11 +111,11 @@ if __name__ == '__main__':
     outroot = sys.argv[1]
     data_dir = sys.argv[2]
 
-    obsid_data = np.loadtxt(f'{outroot}_allinfo_full_withratio.csv',dtype='str',delimiter=',')[::,0]
+    obsid_data = np.loadtxt(f'{outroot}/allinfo_full_withratio.csv',dtype='str',delimiter=',')[::,0]
 
     out = make_spreadsheet(data_dir,obsid_data)
     header = 'obsid,Ce,Cv,DOF,stat'
     header += ',Ce restricted,Cv restricted,DOF restricted,stat restricted'
     header += ',Ce alt,Cv alt,DOF alt,stat alt'
     header += ',P(alt vs main),P(main vs res),P(alt vs res)'
-    np.savetxt(f'{outroot}_stats.csv',out,fmt='%s',delimiter = ',',header = header)
+    np.savetxt(f'{outroot}/stats.csv',out,fmt='%s',delimiter = ',',header = header)
