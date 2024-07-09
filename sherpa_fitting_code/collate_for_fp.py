@@ -15,16 +15,16 @@ import sys
 import os
 import numpy as np
 
-def move_to_min_abs(obsid,min_abs_dir,data_dir): #copies files for the indicated obsid to the min abs directory
+def move_to_min_abs(obsid,min_abs_dir,data_dir, ending=''): #copies files for the indicated obsid to the min abs directory
     newdir = f'{min_abs_dir}/{obsid}'
     try:
         os.system(f'mkdir {newdir}')
     except:
         pass
 
-    os.system(f'cp {data_dir}/{obsid}/primary/sherpaout.txt {min_abs_dir}/{obsid}/{obsid}_abs_summary.txt')
-    os.system(f'cp {data_dir}/{obsid}/primary/sherpa_data_fit.pdf {min_abs_dir}/{obsid}/{obsid}_sherpa_data_fit.pdf')
-    os.system(f'cp {data_dir}/{obsid}/primary/get_abs.save {min_abs_dir}/{obsid}/{obsid}_get_abs.save')
+    os.system(f'cp {data_dir}/{obsid}/primary/sherpaout{ending}.txt {min_abs_dir}/{obsid}/{obsid}_abs_summary.txt')
+    os.system(f'cp {data_dir}/{obsid}/primary/sherpa_data_fit{ending}.pdf {min_abs_dir}/{obsid}/{obsid}_sherpa_data_fit.pdf')
+    os.system(f'cp {data_dir}/{obsid}/primary/get_abs{ending}.save {min_abs_dir}/{obsid}/{obsid}_get_abs.save')
 
 
 def is_unique(list):
@@ -137,7 +137,7 @@ def examine_logs(min_abs,write_out,data_dir,outroot, model=''):
                 continue
             else:
                 min_abs_list.append(obsid)
-                move_to_min_abs(obsid,min_abs_dir,data_dir)
+                move_to_min_abs(obsid,min_abs_dir,data_dir, model_ending_2)
 
         if not min_abs or float(nH) < 0.05:
         #if either the function was not called to run on min_abs or

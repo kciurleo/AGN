@@ -4,8 +4,8 @@
 input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/haves.txt"
 
 #Directories
-start_dir="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
-end_dir="/Volumes/galaxies/Katie/xray_data"
+start_dir="/Volumes/galaxies/Katie/xray_data/"
+end_dir="/opt/pwdata/katie/csc2.1data"
 
 #Copy entire directories
 while read F  ; do

@@ -7,6 +7,7 @@ import sys
 import glob
 import os
 from os import path
+import pandas as pd
 from ciao_contrib.runtool import *
 from PyAstronomy import pyasl #used for unit conversion
 from bxa.sherpa.background.models import ChandraBackground
@@ -19,6 +20,7 @@ from calc_cosmos_for_fp import cosmo_calc
 from get_abs_sherpa_bxa_alt import get_abs_alt
 from get_abs_sherpa_bxa_restricted import get_abs_restricted
 from make_stat_table import *
+from best_model import *
 
 xspec_init_command = 'hea'
 xspec_start_command = 'xspec'
@@ -933,8 +935,78 @@ def main():
     statsheader += ',P(alt vs main),P(main vs res),P(alt vs res)'
     np.savetxt(f'{outroot}/stats.csv',out,fmt='%s',delimiter = ',',header = statsheader)
 
+
     ####################
-    #BEST_MODEL.PY
+    #Find the triply unabsorbed targets and determine best model for all targets
+    print('Finding triply unabsorbed targets.')
+    get_triply_unabsorbed(outroot)
+
+    print('Finding best models.')
+    best_models = get_best_model(data_dir, yes_matches)
+
+
+    ####################
+    #Write out final data
+    print('Writing final stats.')
+    try:
+        os.system(f'mkdir -p {outroot}/final_data')
+    except:
+        pass
+
+    main = pd.read_csv(f'{data_dir}/allinfo_full_withratio.csv', dtype=str)
+    alt = pd.read_csv(f'{data_dir}/allinfo_full_withratio_alt.csv', dtype=str)
+    res = pd.read_csv(f'{data_dir}/allinfo_full_withratio_res.csv', dtype=str)
+
+    final_data = pd.DataFrame(columns=main.columns)
+
+    #Find which model best fits an obsid and use that info in the final table
+    for i in range(len(yes_matches)):
+        if best_models[i]=='res':
+            df=res
+        elif best_models[i]=='alt':
+            df=alt
+        else:
+            df=main
+            #main but also includes errors
+
+        selected_row = df.loc[df['# ObsID']==yes_matches[i]]
+        selected_row.insert(0, 'model', best_models[i])
+        
+        final_data = pd.concat([final_data, selected_row], ignore_index=True)
+
+    #Move model to beginning of csv
+    final_data.insert(1, 'model', final_data.pop('model'))
+
+    #Find targets unabsorbed in their best models
+    best_unabsorbed = is_best_unabsorbed(outroot, yes_matches, best_models)
+    final_data.insert(1, 'unabsorbed', best_unabsorbed)
+
+    #Identify nans and save to csv
+    final_data = final_data.replace(np.nan, 'NaN', regex=True)
+
+    final_data.to_csv(f'{outroot}/final_data/final_info_full.csv', index=False)
+
+    #Save just the minimally absorbed targets
+    min_abs_final = final_data.loc[final_data['unabsorbed']==True]
+    min_abs_final = min_abs_final.reset_index(drop=True)
+    min_abs_final.to_csv(f'{outroot}/final_data/final_info_min_abs_full.csv', index=False)
+
+    with open(f'{outroot}/final_data/final_min_abs_obsids.txt', 'w') as final_min_abs_file:
+        final_min_abs_file.write('#The following sources are unabsorbed in their best model:')
+        for id, obsid in enumerate(min_abs_final['# ObsID']):
+            final_min_abs_file.write(f"\n{obsid}")
+
+            #Move files from relevant data directory to final resting place
+            model=min_abs_final['model'][id]
+            if model == 'alt' or model == 'alternate':
+                model_ending_2 = '_alt'
+            elif model == 'res' or model == 'restricted':
+                model_ending_2 = '_restricted'
+            else:
+                model_ending_2 = ''
+
+            move_to_min_abs(obsid,f'{outroot}/final_data',data_dir, model_ending_2)
+    
 
     print('Finished')
     print('Examine error logs for errors encountered')
