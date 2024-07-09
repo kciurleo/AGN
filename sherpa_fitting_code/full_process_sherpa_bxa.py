@@ -320,7 +320,7 @@ def main():
         print('No chaser data found. Matching on coordinates.')
     #end edit
 
-    coords_data = np.loadtxt(coords_path,delimiter=',', dtype='str') #may need to be changed
+    coords_data = np.loadtxt(coords_path,delimiter=',', dtype='str', comments=None) #may need to be changed
 
     if spec_clobber == 'no':
         print('***Warning: not clobbering spectrum may lead to overwrite issues***')
@@ -341,7 +341,7 @@ def main():
     if chaser_path == 'no':
         coords_header = coords_data[0,::]
         #change these as needed to adapt to your csv
-        name_header = 'Name' 
+        name_header = '# Name'
         obsid_header = 'ObsID'
         ra_header = 'RA'
         dec_header = 'Dec'
@@ -422,7 +422,10 @@ def main():
     #Edit 7/3/2024
     #if not nh_clobber:
     if nh_clobber == 'yes' or not path.exists(f'{cwd}/nh.log'):
-        os.system(f'rm {cwd}/nh.log')
+        try:
+            os.system(f'rm {cwd}/nh.log')
+        except:
+            pass
         #added cwd, since nh spits out the log on cwd
     #End edit
 
@@ -461,6 +464,7 @@ def main():
                 try:
                     detect(dir)
                 except:
+                    print('wavdetect failed')
                     error_doc.write(f'{obsid} failed during wavdetect or fluximage\n')
             else:
                 print('Wavdetect already run and clobber is no')

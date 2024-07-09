@@ -75,4 +75,14 @@ def get_best_model(data_dir, obsids):
 
     return best_models
 
-print(get_best_model(data_dir,['10561', '11469', '6129', '6128', '5929']))
+#print(get_best_model(data_dir,['10561', '11469', '6129', '6128', '5929']))
+
+
+seth = pd.read_csv("/Volumes/galaxies/Seth/AGNs/x-ray/final_data/all_info_final.csv")
+def strip_letters(id_str):
+    return ''.join(filter(str.isdigit, id_str))
+
+# Apply function and convert to numeric
+seth['ObsID'] = seth['ObsID'].apply(strip_letters)
+
+seth.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/seth_full_list.csv', index=False)

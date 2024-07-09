@@ -14,3 +14,7 @@ Check that all header names for chaser path etc are correct (e.g. Name, ObsID_nu
 E.g. if you don\'92t have a chaser file:
 
 	python /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/full_process_sherpa_bxa.py /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/data /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/data /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/testcoords.csv 'no' 'yes' 'yes' 'yes' 'yes' 'yes'
+
+Or for the full data
+
+	python /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/full_process_sherpa_bxa.py /opt/pwdata/katie/rerunning_seth_data /opt/pwdata/katie/rerunning_seth_data /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/seth_full_list.csv 'no' 'no' 'no' 'no' 'no' 'no'

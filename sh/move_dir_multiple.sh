@@ -4,13 +4,18 @@
 # This version accounts for the possibility that the file is in two places, and skips the copying
 # if the file already exists at the end directory.
 
-input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/seth_final_obsids.txt"
+#input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/seth_final_obsids.txt"
+input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/havenots.txt"
+
+#Directories
+start_dir1="/Volumes/galaxies/Katie/xray_data/"
+end_dir="/opt/pwdata/katie/csc2.1data/"
 
 # Directories
-start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
+#start_dir1="/Volumes/galaxies/Seth/AGNs/x-ray/new_csc/dataproducts/"
 start_dir2="/Volumes/galaxies/Seth/AGNs/x-ray/csc_v2/"
 start_dir3="/Volumes/galaxies/Katie/xray_data/"
-end_dir="/opt/katie/data/"
+#end_dir="/opt/katie/data/"
 
 # Function to check if directory exists
 directory_exists() {
