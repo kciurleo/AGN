@@ -959,7 +959,7 @@ def main():
     #Write out final data
     print('Writing final stats.')
     try:
-        os.system(f'mkdir -p {outroot}/final_data')
+        os.system(f'mkdir {outroot}/final_data')
     except:
         pass
 
@@ -997,14 +997,15 @@ def main():
     final_data.to_csv(f'{outroot}/final_data/final_info_full.csv', index=False)
 
     #Save just the minimally absorbed targets, excluding compton thick ones
-    min_abs_final = final_data.loc[(final_data['unabsorbed']==True) & (final_data['compton thick']==False)]
+    min_abs_final = final_data.loc[(final_data['unabsorbed']==True) & (final_data['compton thick']=='False')]
+
     min_abs_final = min_abs_final.reset_index(drop=True)
     min_abs_final.to_csv(f'{outroot}/final_data/final_info_min_abs_full.csv', index=False)
 
-    with open(f'{outroot}/final_data/final_min_abs_obsids.txt', 'w') as final_min_abs_file:
+    with open(f'{outroot}/final_data/final_min_abs_list.txt', 'w') as final_min_abs_file:
         final_min_abs_file.write('#The following sources are unabsorbed in their best model:')
-        for id, obsid in enumerate(min_abs_final['# ObsID']):
-            final_min_abs_file.write(f"\n{obsid}")
+        for id, row in min_abs_final.iterrows():
+            final_min_abs_file.write(f"\n{row['CXO name']}")
 
             #Move files from relevant data directory to final resting place
             model=min_abs_final['model'][id]
@@ -1015,22 +1016,22 @@ def main():
             else:
                 model_ending_2 = ''
 
-            move_to_min_abs(obsid,f'{outroot}/final_data',data_dir, model_ending_2)
+            move_to_min_abs(row['# ObsID'],f'{outroot}/final_data',data_dir, model_ending_2)
     
     #Identify compton thick sources
     print('Finding compton thick targets.')
     compton = final_data.loc[final_data['compton thick']==True]
-    with open(f'{outroot}/final_data/final_compton_obsids.txt', 'w') as compton_file:
+    with open(f'{outroot}/final_data/final_compton_list.txt', 'w') as compton_file:
         compton_file.write('#The following sources are compton thick:')
-        for id, obsid in enumerate(compton['# ObsID']):
-            final_min_abs_file.write(f"\n{obsid}")
+        for id, name in enumerate(compton['CXO name']):
+            final_min_abs_file.write(f"\n{name}")
 
-    #Find the triply unabsorbed targets, ignoring compton thick sources
+    #Find the triply unabsorbed targets, ignoring compton thick sources; this is sort of a silly thing.
     print('Finding triply unabsorbed targets.')
     unabsorbed_list = list(set(get_triply_unabsorbed(outroot))-set(compton['# ObsID']))
 
-    with open(f'{outroot}/final_data/triply_unabsorbed.txt', 'w') as triply_unabsorbed_file:
-        triply_unabsorbed_file.write('#The following sources are unabsorbed in all models:')
+    with open(f'{outroot}/final_data/triply_unabsorbed_list.txt', 'w') as triply_unabsorbed_file:
+        triply_unabsorbed_file.write('#The following obsids contain sources which are unabsorbed in all models:')
         for i in range(len(unabsorbed_list)):
             triply_unabsorbed_file.write(f'\n{unabsorbed_list[i]}')
 
