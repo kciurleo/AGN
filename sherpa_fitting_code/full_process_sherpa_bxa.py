@@ -950,10 +950,7 @@ def main():
 
 
     ####################
-    #Find the triply unabsorbed targets and determine best model for all targets
-    print('Finding triply unabsorbed targets.')
-    get_triply_unabsorbed(outroot)
-
+    #Determine best model for all targets
     print('Finding best models.')
     best_models = get_best_model(data_dir, yes_matches)
 
@@ -999,8 +996,8 @@ def main():
 
     final_data.to_csv(f'{outroot}/final_data/final_info_full.csv', index=False)
 
-    #Save just the minimally absorbed targets
-    min_abs_final = final_data.loc[final_data['unabsorbed']==True]
+    #Save just the minimally absorbed targets, excluding compton thick ones
+    min_abs_final = final_data.loc[(final_data['unabsorbed']==True) & (final_data['compton thick']==False)]
     min_abs_final = min_abs_final.reset_index(drop=True)
     min_abs_final.to_csv(f'{outroot}/final_data/final_info_min_abs_full.csv', index=False)
 
@@ -1021,11 +1018,21 @@ def main():
             move_to_min_abs(obsid,f'{outroot}/final_data',data_dir, model_ending_2)
     
     #Identify compton thick sources
+    print('Finding compton thick targets.')
     compton = final_data.loc[final_data['compton thick']==True]
     with open(f'{outroot}/final_data/final_compton_obsids.txt', 'w') as compton_file:
         compton_file.write('#The following sources are compton thick:')
         for id, obsid in enumerate(compton['# ObsID']):
             final_min_abs_file.write(f"\n{obsid}")
+
+    #Find the triply unabsorbed targets, ignoring compton thick sources
+    print('Finding triply unabsorbed targets.')
+    unabsorbed_list = list(set(get_triply_unabsorbed(outroot))-set(compton['# ObsID']))
+
+    with open(f'{outroot}/final_data/triply_unabsorbed.txt', 'w') as triply_unabsorbed_file:
+        triply_unabsorbed_file.write('#The following sources are unabsorbed in all models:')
+        for i in range(len(unabsorbed_list)):
+            triply_unabsorbed_file.write(f'\n{unabsorbed_list[i]}')
 
     print('Finished')
     print('Examine error logs for errors encountered')

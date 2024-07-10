@@ -50,11 +50,6 @@ def get_triply_unabsorbed(outroot):
 
     #Check which are absorbed in all three
     unabsorbed_list = triply_unabsorbed(outroot, min_abs_potential_list)
-
-    with open(f'{outroot}/triply_unabsorbed.txt', 'w') as triply_unabsorbed_file:
-        triply_unabsorbed_file.write('#The following sources are unabsorbed in all models:')
-        for i in range(len(unabsorbed_list)):
-            triply_unabsorbed_file.write(f'\n{unabsorbed_list[i]}')
     
     return unabsorbed_list
 

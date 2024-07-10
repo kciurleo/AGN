@@ -129,3 +129,5 @@ print(np.min(df['Flux_OIII_5006']))
 nonzero = df.loc[df['Flux_OIII_5006'] != '0.0' ]
 print(len(df['Flux_OIII_5006']))
 print(len(nonzero['Flux_OIII_5006']))
+for i in range(len(set(nonzero['Flux_OIII_5006']))):
+    print(list(set(nonzero['Flux_OIII_5006']))[i])
