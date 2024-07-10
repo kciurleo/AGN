@@ -15,7 +15,7 @@ from bxa.sherpa.background.fitters import SingleFitter
 from get_abs_sherpa_bxa import *
 from collate_for_fp import *
 import smtplib, ssl
-from compton_check_for_fp import lookup_oiii, calc_ratio
+from compton_check_no_chaser import get_OIII, get_ratio
 from calc_cosmos_for_fp import cosmo_calc
 from get_abs_sherpa_bxa_alt import get_abs_alt
 from get_abs_sherpa_bxa_restricted import get_abs_restricted
@@ -321,6 +321,7 @@ def main():
     #end edit
 
     coords_data = np.loadtxt(coords_path,delimiter=',', dtype='str', comments=None) #may need to be changed
+    coords_df = pd.read_csv(coords_path)
 
     if spec_clobber == 'no':
         print('***Warning: not clobbering spectrum may lead to overwrite issues***')
@@ -341,10 +342,10 @@ def main():
     if chaser_path == 'no':
         coords_header = coords_data[0,::]
         #change these as needed to adapt to your csv
-        name_header = '# Name'
-        obsid_header = 'ObsID'
-        ra_header = 'RA'
-        dec_header = 'Dec'
+        name_header = 'CSC21P_name'
+        obsid_header = 'CHANDRA_OBSID'
+        ra_header = 'ra_x'
+        dec_header = 'dec_x'
         z_header = 'Z'
         for i, header in enumerate(coords_header):
             if header == name_header:
@@ -820,7 +821,7 @@ def main():
         #End edit
         data_full_collated_min_abs = collate(data_dir,outroot,chaser_path,True, model)
         data_full_collated = collate(data_dir,outroot,chaser_path,False, model)
-
+        num_columns = data_full_collated_min_abs.shape[1]
 
         ####################
         #add cosmo calculations and compton thick check to the full csvs made by collate
@@ -833,43 +834,46 @@ def main():
         full_OIII_err_arr = []
         full_ratio_arr = []
         full_ratio_err_arr = []
-        full_bID_arr = []
+        #full_bID_arr = []
+        full_compton_thick_arr = []
         for i in range(len(data_full_collated[::,0])):
-            z = data_full_collated[i,17]
+            z = data_full_collated[i,-3]
             xflux = data_full_collated[i,8]
             xflux_err = data_full_collated[i,10]
 
             lum, lum_err = cosmo_calc(z,xflux,xflux_err)
             #Edit 7/3/2024: Temporarily commenting out, since no chaser file
-            '''
-            flux_doc = 'OIII_fluxes.csv'
-            '''
-            name = data_full_collated[i,14]
             
-            '''
-            OIII_flux, OIII_flux_err,bID = lookup_oiii(flux_doc,name,chaser_path)
+            #flux_doc = 'OIII_fluxes.csv'
+            
+            name = data_full_collated[i,-6]
+            
+            #OIII_flux, OIII_flux_err,bID = lookup_oiii(flux_doc,name,chaser_path)
 
-            ratio,ratio_err = calc_ratio(OIII_flux, OIII_flux_err, xflux, xflux_err)
-            '''
+            OIII_flux, OIII_flux_err = get_OIII(name, coords_df)
+            ratio,ratio_err, compton_thick = get_ratio(OIII_flux, OIII_flux_err, xflux, xflux_err)
+            
             #append to the arrays
-            '''
-            full_bID_arr.append(bID)
-            '''
+            #full_bID_arr.append(bID)
+            
             full_lum_arr.append(lum)
             full_lum_err_arr.append(lum_err)
-            '''
+            
             full_OIII_arr.append(OIII_flux)
             full_OIII_err_arr.append(OIII_flux_err)
+            
             full_ratio_arr.append(ratio)
             full_ratio_err_arr.append(ratio_err)
+            full_compton_thick_arr.append(compton_thick)
 
+        '''
         data_full_collated = np.column_stack((data_full_collated,full_lum_arr,full_lum_err_arr,full_OIII_arr,full_OIII_err_arr,full_ratio_arr,full_ratio_err_arr,full_bID_arr))
 
         header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,CXO name,RA,Dec,Z,galactic nH,counts,exposure time (ks),observation cycle,count rate (c/s),RA offset (deg),dec offset,offset,luminosity,luminosity error,[OIII] flux,[OIII] flux error,Fx/F[OIII],Fx/F[OIII] error,SDSS best ID'
         '''
-        data_full_collated = np.column_stack((data_full_collated,full_lum_arr,full_lum_err_arr))
+        data_full_collated = np.column_stack((data_full_collated,full_lum_arr,full_lum_err_arr,full_OIII_arr,full_OIII_err_arr,full_ratio_arr,full_ratio_err_arr, full_compton_thick_arr))
 
-        header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Soft flux,fluxsoft error plus,fluxsoft error minus,Medium flux,fluxmed error plus,fluxmed error minus,Hard flux,fluxhard error plus,fluxhard error minus,Sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'
+        header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Soft flux,fluxsoft error plus,fluxsoft error minus,Medium flux,fluxmed error plus,fluxmed error minus,Hard flux,fluxhard error plus,fluxhard error minus,Sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error,Flux_OIII_5006,Flux_OIII_5006_err,Fx/F[OIII],Fx/F[OIII],compton thick'
         #End temporary edit
         
         #Edited 7/3/2024
@@ -884,44 +888,49 @@ def main():
         min_OIII_err_arr = []
         min_ratio_arr = []
         min_ratio_err_arr = []
-        min_bID_arr = []
+        #min_bID_arr = []
+        min_compton_thick_arr = []
         for i in range(len(data_full_collated_min_abs[::,0])):
-            z = data_full_collated_min_abs[i,17]
+            z = data_full_collated_min_abs[:, -3]
             xflux = data_full_collated_min_abs[i,8]
             xflux_err = data_full_collated_min_abs[i,10]
 
             lum, lum_err = cosmo_calc(z,xflux,xflux_err)
 
             #Edited 7/3/2024: temporary edit because no chaser
-            '''
-            flux_doc = 'OIII_fluxes.csv'
-            '''
-            name = data_full_collated_min_abs[i,14]
-            '''
-            OIII_flux, OIII_flux_err,bID = lookup_oiii(flux_doc,name,chaser_path)
+            
+            #flux_doc = 'OIII_fluxes.csv'
+            
+            name = data_full_collated_min_abs[:, -6]
+            
+            #OIII_flux, OIII_flux_err,bID = lookup_oiii(flux_doc,name,chaser_path)
+            OIII_flux, OIII_flux_err = get_OIII(name, coords_df)
 
-            ratio,ratio_err = calc_ratio(OIII_flux, OIII_flux_err, xflux, xflux_err)
-
+            ratio,ratio_err,compton_thick = get_ratio(OIII_flux, OIII_flux_err, xflux, xflux_err)
+            
             #append to the arrays
-            min_bID_arr.append(bID)
-            '''
+            #min_bID_arr.append(bID)
+            
             min_lum_arr.append(lum)
             min_lum_err_arr.append(lum_err)
-            '''
+            
             min_OIII_arr.append(OIII_flux)
             min_OIII_err_arr.append(OIII_flux_err)
+            
             min_ratio_arr.append(ratio)
             min_ratio_err_arr.append(ratio_err)
+            min_compton_thick_arr.append(compton_thick)
+            
             
 
-
+        '''
         data_full_collated_min_abs = np.column_stack((data_full_collated_min_abs,min_lum_arr,min_lum_err_arr,min_OIII_arr,min_OIII_err_arr,min_ratio_arr,min_ratio_err_arr,min_bID_arr))
 
         header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,CXO name,RA,Dec,Z,galactic nH,counts,exposure time (ks),observation cycle,count rate (c/s),RA offset (deg),dec offset,offset,luminosity,luminosity error,[OIII] flux,[OIII] flux error,Fx/F[OIII],Fx/F[OIII] error,SDSS best ID'
         '''
-        data_full_collated_min_abs = np.column_stack((data_full_collated_min_abs,min_lum_arr,min_lum_err_arr))
+        data_full_collated_min_abs = np.column_stack((data_full_collated_min_abs,min_lum_arr,min_lum_err_arr,min_OIII_arr,min_OIII_err_arr,min_ratio_arr,min_ratio_err_arr, min_compton_thick_arr))
 
-        header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error'       
+        header = 'ObsID,Cstat,nH,nH error plus,nH error minus,gamma,gamma error plus,gamma error minus,0.3-7.5 flux,xflux error plus,xflux_error_minus,2-10 flux,flux210 error plus,flux210 error minus,Soft flux,fluxsoft error plus,fluxsoft error minus,Medium flux,fluxmed error plus,fluxmed error minus,Hard flux,fluxhard error plus,fluxhard error minus,Sum flux,fluxsum error plus,fluxsum error minus,Test Statistic,Ce,Cv,CXO name,RA,Dec,Z,galactic nH,counts,luminosity,luminosity error,Flux_OIII_5006,Flux_OIII_5006_err,Fx/F[OIII],Fx/F[OIII],compton thick'
         #End temporary edit
         
         np.savetxt(f'{min_abs_dir}/{outroot_text}_min_abs_allinfo_full_withratio{model_ending_1}.csv',data_full_collated_min_abs,fmt='%s',delimiter=',',header=header)
@@ -1011,6 +1020,12 @@ def main():
 
             move_to_min_abs(obsid,f'{outroot}/final_data',data_dir, model_ending_2)
     
+    #Identify compton thick sources
+    compton = final_data.loc[final_data['compton thick']==True]
+    with open(f'{outroot}/final_data/final_compton_obsids.txt', 'w') as compton_file:
+        compton_file.write('#The following sources are compton thick:')
+        for id, obsid in enumerate(compton['# ObsID']):
+            final_min_abs_file.write(f"\n{obsid}")
 
     print('Finished')
     print('Examine error logs for errors encountered')

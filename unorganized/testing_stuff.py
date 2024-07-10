@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import glob
 import numpy as np
-
+'''
 needed = pd.read_csv("/Volumes/galaxies/Seth/AGNs/x-ray/final_data/all_info_final.csv").head()
 
 final_data = pd.DataFrame(columns=needed.columns)
@@ -106,3 +106,26 @@ with open('/Users/kciurleo/Documents/kciurleo/AGN/csvs/not_found_obsids.txt','w'
 
     for item in unfound:
             doc.write(f'{item}\n')
+'''
+
+df=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/obsids_seyferts.csv', dtype=str)
+'''
+names = ['2CXO J134736.4+173404','2CXO J131651.2+055647','2CXO J235720.1-005829','2CXO J104429.3+113810']
+
+new_df = pd.DataFrame(columns=df.columns)
+
+for name in names:
+    row = df.loc[df['CSC21P_name'] == name].head(1)
+    new_df = pd.concat([new_df, row],ignore_index=True)
+
+additionalrow = df.loc[(df['CSC21P_name'] == '2CXO J135317.9+332929') & (df['CHANDRA_OBSID'] == '4867')]
+
+new_df = pd.concat([new_df, additionalrow], ignore_index=True)
+new_df.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/katie_testcoords.csv', index=False)
+'''
+
+print(np.min(df['Flux_OIII_5006']))
+
+nonzero = df.loc[df['Flux_OIII_5006'] != '0.0' ]
+print(len(df['Flux_OIII_5006']))
+print(len(nonzero['Flux_OIII_5006']))
