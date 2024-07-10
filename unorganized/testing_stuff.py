@@ -85,4 +85,24 @@ def strip_letters(id_str):
 # Apply function and convert to numeric
 seth['ObsID'] = seth['ObsID'].apply(strip_letters)
 
-seth.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/seth_full_list.csv', index=False)
+#seth.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/seth_full_list.csv', index=False)
+
+obs = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/obsids_seyferts.csv')['CHANDRA_OBSID']
+
+guys = os.listdir("/opt/pwdata/katie/csc2.1data")
+guys_int=[]
+for i in guys:
+    guys_int.append(int(i))
+
+def isindir(obj, dir):
+    dudes = set(os.listdir(dir))
+
+print(type(obs[0]),'and',type(guys_int[0]))
+print(len(set(obs)-set(guys_int)))
+unfound = list(set(obs)-set(guys_int))
+
+with open('/Users/kciurleo/Documents/kciurleo/AGN/csvs/not_found_obsids.txt','w') as doc:
+    doc.write("#This document contains obsids related to potential Seyfert candidates which aren't found on the archive site.")
+
+    for item in unfound:
+            doc.write(f'{item}\n')

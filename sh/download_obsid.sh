@@ -5,10 +5,11 @@
 #lines 3 to 7) with a 5m wait in between
 
 #File with obsids listed
-input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/havenots.txt"
+#input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/havenots.txt"
+input_file="/Users/kciurleo/Downloads/downloadtoopt.txt"
 
 #End directory to download data into
-cd "/Volumes/galaxies/Katie/xray_data"
+cd "/opt/pwdata/katie/csc2.1data"
 
 #Make sure we're in ciao
 source activate ciao-4.16
@@ -26,9 +27,9 @@ while IFS= read -r F; do
         #If already downloaded, Chandra doesn't redownload
 
         #Pause for 5 minutes
-        sleep 150;
+        #sleep 150;
         echo "Pausing";
-        sleep 150;
+        #sleep 150;
     fi
     ((current_line++))
 done < "$input_file"

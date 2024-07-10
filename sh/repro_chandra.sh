@@ -4,7 +4,7 @@
 #are all in one input directory, with a pause in between.
 
 #Start directory where data is downloaded
-input_dir="/Volumes/galaxies/Katie/xray_data"
+input_dir="/opt/pwdata/katie/csc2.1data"
 
 #Make sure we're in ciao
 source activate ciao-4.16
