@@ -771,7 +771,6 @@ def main():
             already_fit = path.exists(f'{dir}/sherpaout.txt') and path.exists(f'{dir}/sherpaout_alt.txt') and path.exists(f'{dir}/sherpaout_restricted.txt')
             try:
                 if fit_clobber == 'yes' or not already_fit:
-                    print('Im doin it')
                     get_abs(n,z,dir)
                     get_abs_alt(n,z,dir)
                     get_abs_restricted(n,z,dir)
