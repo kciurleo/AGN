@@ -294,9 +294,9 @@ def main():
         sys.exit('Background clobber not recognized')
 
     if 'n' in fit_clobber:
-        bkg_clobber = 'no'
+        fit_clobber = 'no'
     elif 'y' in fit_clobber:
-        bkg_clobber = 'yes'
+        fit_clobber = 'yes'
     else:
         sys.exit('Fit clobber not recognized')
 
@@ -770,7 +770,6 @@ def main():
             dir = f'{data_dir}/{o}/primary'
             already_fit = path.exists(f'{dir}/sherpaout.txt') and path.exists(f'{dir}/sherpaout_alt.txt') and path.exists(f'{dir}/sherpaout_restricted.txt')
             try:
-                print(fit_clobber)
                 if fit_clobber == 'yes' or not already_fit:
                     print('Im doin it')
                     get_abs(n,z,dir)
