@@ -5,6 +5,8 @@ from astroquery.skyview import SkyView
 import matplotlib.pyplot as plt
 import astropy.units as u
 import numpy as np
+from matplotlib.patches import Circle
+
 '''
 XMM_result = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/XMM_query_result.vot').to_table().to_pandas()
 XMM_result.rename(columns={'ra_2':'cscra', 'dec_2':'cscdec'}, inplace=True)
@@ -79,15 +81,24 @@ def get_image(ra, dec, deg, pix, title):
     plt.imshow(image_data, cmap='viridis', origin='lower', norm=simple_norm(image_data, 'sqrt'))
     plt.colorbar(label='Intensity')
     colors = ['black','red','blue']
+
+    #SDSS guys
     for i in range(len(ra)):
         newra, newdec = pixel_coords(ra[i], dec[i], ra[0], dec[0], deg, pix)
         plt.scatter(newra, newdec, marker='o', s=100, edgecolor=colors[i], facecolor='none', label=f'SDSS ({ra[i]}, {dec[i]})', alpha=0.75)
         xmmra, xmmdec = pixel_coords(title[0], title[1], ra[0], dec[0], deg, pix)
+    
+    #XMM guy
     plt.scatter(xmmra, xmmdec, marker='x', s=100, c='black', label=f'XMM {title}')
+
+    #Cone search
+    circle = Circle((xmmra,xmmdec), (10/3600)*(pix/deg), edgecolor='limegreen', facecolor='none', label='CSC Cone Search Radius')
+    circle2 = Circle((xmmra,xmmdec), (4/3600)*(pix/deg), edgecolor='limegreen', facecolor='none', alpha=0.25)
+    
+    plt.gca().add_patch(circle)
+    plt.gca().add_patch(circle2)
+
     plt.title(f'{survey} image, XMM coords: {title}')
-    #plt.xlabel(f'Pixels, {deg:.2e} degrees across')
-    #plt.ylabel(f'Pixels, {deg:.2e} degrees across')
-    plt.legend()
 
     #Axes
     ticks=np.arange(0,pix+50, 50)
@@ -102,7 +113,7 @@ def get_image(ra, dec, deg, pix, title):
     plt.gca().set_xticklabels(raticks_formatted)
     plt.gca().set_yticklabels(decticks_formatted)
 
-
+    plt.legend()
     plt.xlabel('RA (degrees)')
     plt.ylabel('Dec (degrees)')
     plt.show(block=False)
@@ -120,3 +131,4 @@ for group_name, group_data in groupedthrees:
 
 
 plt.show()
+
