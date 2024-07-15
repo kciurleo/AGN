@@ -1,40 +1,30 @@
 #This query was used on CasJobs to see if the XMM results had multiple SpecObjects
-#nearby, which would make us worry about false match probability
+#nearby, which would make us worry about false match probability. num_results is not
+#really useful other than a brief glance of how many multiple matches there were
 
-SELECT DISTINCT
-    specObjID,
-    plate,
-    mjd,
-    fiberID,
-    distance,
-    ra,
-    dec,
-    num_results,
-    specObjAll_ra,
-    specObjAll_dec
-FROM (
+SELECT
+    n.specObjID,
+    n.plate,
+    n.mjd,
+    n.fiberID,
+    n.distance,
+    xmm.ra,
+    xmm.dec,
+    COUNT(*) OVER (PARTITION BY xmm.ra, xmm.dec) AS num_results,
+    sa.ra AS specObjAll_ra,
+    sa.dec AS specObjAll_dec,
+    sa.targetObjID
+FROM
+    MyDB.xmmresults AS xmm
+CROSS APPLY
+    dbo.fGetNearbySpecObjAllEq(xmm.ra, xmm.dec, 15./60.) AS n
+CROSS APPLY (
     SELECT
-        n.specObjID,
-        n.plate,
-        n.mjd,
-        n.fiberID,
-        n.distance,
-        xmm.ra,
-        xmm.dec,
-        COUNT(*) OVER (PARTITION BY xmm.ra, xmm.dec) AS num_results,
-        sa.ra AS specObjAll_ra,
-        sa.dec AS specObjAll_dec
+        ra,
+        dec,
+        targetObjID
     FROM
-        MyDB.xmmresults AS xmm
-    CROSS APPLY
-        dbo.fGetNearbySpecObjAllEq(xmm.ra, xmm.dec, 15./60.) AS n
-    CROSS APPLY (
-        SELECT
-            ra,
-            dec
-        FROM
-            dr18.specObjAll AS sa
-        WHERE
-            sa.specObjID = n.specObjID
-    ) AS sa
-) AS filtered_results;
+        dr18.specObjAll AS sa
+    WHERE
+        sa.specObjID = n.specObjID
+) AS sa;

@@ -18,6 +18,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `targetmap.py` makes a map of the CSC2.1 targets, along with Seyfert candidates.
 
+`false_probability_xmm.py` collects code relevant to conducting a false match probability calculation on XMM/SDSS candidates, including creating optical images of targets. 
+
 ### sh
 
 `find_obsid_given_name.sh` takes in a file with IAU names, then spits out a new file with the chandra OBSIDs (and dates and lengths/times) for those objects.
