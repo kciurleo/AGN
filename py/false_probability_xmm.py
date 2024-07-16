@@ -4,16 +4,16 @@ from astropy.coordinates import SkyCoord
 from astroquery.skyview import SkyView
 import matplotlib.pyplot as plt
 import astropy.units as u
+from astropy.io import votable
 import numpy as np
 from matplotlib.patches import Circle
 
-'''
+
 XMM_result = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/XMM_query_result.vot').to_table().to_pandas()
 XMM_result.rename(columns={'ra_2':'cscra', 'dec_2':'cscdec'}, inplace=True)
-final=XMM_result.drop_duplicates()
+xmm_for_casjobs=XMM_result.drop_duplicates()
 
-final.to_csv('/Users/kciurleo/Downloads/XMMforcasjobs.csv', index=False)
-'''
+#xmm_for_casjobs.to_csv('/Users/kciurleo/Downloads/XMMforcasjobs.csv', index=False)
 
 #All matches within 15 arcsec
 falseprobtest = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/falsematchtest.csv')
@@ -123,6 +123,7 @@ groupedtwos = twos.groupby(['ra', 'dec'])
 groupedthrees = threes.groupby(['ra', 'dec'])
 
 #Loop over and print
+'''
 for group_name, group_data in groupedtwos:
     get_image(np.array(group_data['specObjAll_ra']), np.array(group_data['specObjAll_dec']), 1/60, 300, group_name)
 
@@ -132,3 +133,4 @@ for group_name, group_data in groupedthrees:
 
 plt.show()
 
+'''
