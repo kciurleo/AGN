@@ -20,6 +20,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `false_probability_xmm.py` collects code relevant to conducting a false match probability calculation on XMM/SDSS candidates, including creating optical images of targets. 
 
+`koulouridis.py` checked that none of the [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) Seyferts were in my sample.
+
 ### sh
 
 `find_obsid_given_name.sh` takes in a file with IAU names, then spits out a new file with the chandra OBSIDs (and dates and lengths/times) for those objects.
@@ -73,6 +75,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 `XMM_query_result.vot` is the downloaded result of the cone search of XMM around the candidates described by `post_async.sh`, with a search radius of 10".
 
 `koulouridis.csv` and `koulouridis_coordinates.csv` are identical sets of Seyfert 2 AGN identified by [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) using XMM and were used to query ChaSer for matching observations. The latter contains only the RA and Dec columns needed for such a query.
+
+`koulouridis_results.csv` are the results of a cone search of 10 arcsec around the Koulouridis Seyferts using ChaSer.
 
 `CorrectedNamesCSC21.txt` contains a list of 400 CSC2.1 objects which were given new names in CSC 2.1, and their true names/names in CSC 2.0, downloaded from the [CSC 2.1 caveats page](https://cxc.cfa.harvard.edu/csc/files/CorrectedNamesCSC21.txt). This is supposed to be corrected in a future data release.
 
