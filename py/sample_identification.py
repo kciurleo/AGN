@@ -93,6 +93,13 @@ table.write('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.vot', overwrit
 #Those that are fully unclassified by both agostino and portsmouth
 unclassified = full_point_sources.loc[((full_point_sources.bpt.isnull()) | (full_point_sources['bpt']=="BLANK")) & ((full_point_sources['sl_class1']==0) | (full_point_sources.sl_class1.isnull()))] 
 
+#Pulled Seth's 1252 total observations, before throwing away those with at least 50 counts, which are 663 unique objects
+seth_candidates = pd.read_csv('/Users/kciurleo/Documents/kciurleo/all_info_final.csv')
+data_overlap = pd.merge(seth_candidates, data, left_on=['SDSS Plate','SDSS Fiber', 'SDSS MJD'], right_on=['PLATE','FIBERID','MJD'], how='inner')
+point_overlap=pd.merge(seth_candidates, point_sources, left_on=['SDSS Plate','SDSS Fiber', 'SDSS MJD'], right_on=['PLATE','FIBERID','MJD'], how='inner')
+s2_overlap = pd.merge(seth_candidates, outer_s2, left_on=['SDSS Plate','SDSS Fiber', 'SDSS MJD'], right_on=['PLATE','FIBERID','MJD'], how='inner')
+
+
 print(f'Sources in 2.1: {len(data):,}')
 print(f'Sources in 2.0: {len(old_data):,}')
 print(f'Sources in both: {len(both_data):,}')
@@ -118,3 +125,11 @@ print(f'Unique Portsmouth-Agostino Seyferts: {len(inner_s2["CSC21P_name"].unique
 print(f'Unique Portsmouth or Agostino Seyferts: {len(outer_s2["CSC21P_name"].unique())}')
 print(f"Unique Portsmouth or Agostino Seyferts processed with 2.1: {len(outer_s2.loc[outer_s2['csc2.1_flag']==True]['CSC21P_name'].unique())}, {len(outer_s2) -len(outer_s2.loc[outer_s2['csc2.1_flag']==True]['CSC21P_name'].unique())} not yet processed")
 print(f'Unique Portsmouth or Agostino Seyferts with exact XMM data: {len(outer_s2["detid"].unique())}')
+print()
+print(f"Seth's unique candidates: {len(seth_candidates['# Name'].unique())}")
+print(f"Seth's unique candidates present in CSC2.1: {len(data_overlap['# Name'].unique())}, {len(seth_candidates['# Name'].unique())-len(data_overlap['# Name'].unique())} missing")
+print(f"Seth's unique candidates present in CSC2.1 point sources: {len(point_overlap['# Name'].unique())}, {len(data_overlap['# Name'].unique())-len(point_overlap['# Name'].unique())} extended sources")
+print(f"Seth's unique candidates present in CSC2.1 outer Seyferts: {len(s2_overlap['# Name'].unique())}, {len(point_overlap['# Name'].unique())-len(s2_overlap['# Name'].unique())} classified as Seyfert/LINER, Composite, or LINER in 2.1")
+print()
+print(f"Unique non-Seth candidates present in CSC2.1 outer Seyferts: {len(outer_s2['CSC21P_name'].unique())-len(s2_overlap['# Name'].unique())}")
+print(f"Total candidates present in CSC2.1: {len(outer_s2['CSC21P_name'].unique())}")

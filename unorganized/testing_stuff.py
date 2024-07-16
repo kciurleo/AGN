@@ -44,10 +44,10 @@ with open('/Users/kciurleo/Documents/kciurleo/AGN/csvs/not_found_obsids.txt','w'
 
     for item in unfound:
             doc.write(f'{item}\n')
-'''
+
 
 df=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/obsids_seyferts.csv', dtype=str)
-'''
+
 names = ['2CXO J134736.4+173404','2CXO J131651.2+055647','2CXO J235720.1-005829','2CXO J104429.3+113810']
 
 new_df = pd.DataFrame(columns=df.columns)
@@ -60,7 +60,7 @@ additionalrow = df.loc[(df['CSC21P_name'] == '2CXO J135317.9+332929') & (df['CHA
 
 new_df = pd.concat([new_df, additionalrow], ignore_index=True)
 new_df.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/katie_testcoords.csv', index=False)
-'''
+
 
 print(np.min(df['Flux_OIII_5006']))
 
@@ -69,3 +69,26 @@ print(len(df['Flux_OIII_5006']))
 print(len(nonzero['Flux_OIII_5006']))
 for i in range(len(set(nonzero['Flux_OIII_5006']))):
     print(list(set(nonzero['Flux_OIII_5006']))[i])
+'''
+data = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv')
+names = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CorrectedNamesCSC21.txt', skiprows=1, names=['current name', 'corrected name'])
+
+seyferts = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.csv')
+
+seth_candidates = pd.read_csv('/Users/kciurleo/Documents/kciurleo/all_info_final.csv')
+set1 = set([1,2,2,3,4])
+set2 = set([5,6,6,6,0])
+
+weird_names_in_seyferts = list(set(names['current name']).intersection(set(seyferts['CSC21P_name'])))
+print(len(weird_names_in_seyferts))
+weird_names_in_seth = list(set(names['corrected name']).intersection(set(seth_candidates['# Name'])))
+print(len(weird_names_in_seth))
+weird_data = list(set(names['corrected name']).intersection(set(data['CSC21P_name'])))
+print(len(weird_data))
+
+anybody = pd.DataFrame(columns=seyferts.columns)
+for i in np.array(names['corrected name']):
+    row = seyferts.loc[seyferts['CSC21P_name']==i]
+    anybody._append(row)
+
+print(anybody)

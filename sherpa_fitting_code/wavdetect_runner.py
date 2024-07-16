@@ -13,6 +13,7 @@ def unglob(list): #unglob reformats files matched with the glob command
 
 def detect(dir): #detect is used to run fluximage and wavdetect in sequence on an obsid
     #needs a level 2 directory with a chandra evt2 file
+    print('fluximaging')
     fluximage.punlearn()
     evt = glob.glob(f'{dir}/*evt2*')
     evt = unglob(evt)
@@ -21,8 +22,11 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     fluximage.bands = '0.3:7.5:2.3'
     fluximage.psfecf=0.9 #one sigma of 2D gaussian (see 'running wavdetect')
     fluximage.clobber = 'yes'
-    #fluximage.verbose = 3
+    fluximage.verbose = 5
+    #print(fluximage)
     fluximage()
+
+    print('wavdetecting')
 
     wavdetect.punlearn()
     img = glob.glob(f'{dir}/*thresh.img')
@@ -37,12 +41,13 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     wavdetect.defnbkgfile = f'{dir}/detect_nbgd.fits'
     wavdetect.scellfile = f'{dir}/detect_scell.fits'
     wavdetect.clobber = 'yes'
+    wavdetect.verbose = 4
     wavdetect()
 
 
 data_dir="/opt/pwdata/katie/csc2.1"
 
-obsids = os.listdir(data_dir)
+obsids = ['12024'] #os.listdir(data_dir)
 failures = []
 
 for obsid in obsids:

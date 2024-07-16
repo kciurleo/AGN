@@ -74,6 +74,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `koulouridis.csv` and `koulouridis_coordinates.csv` are identical sets of Seyfert 2 AGN identified by [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) using XMM and were used to query ChaSer for matching observations. The latter contains only the RA and Dec columns needed for such a query.
 
+`CorrectedNamesCSC21.txt` contains a list of 400 CSC2.1 objects which were given new names in CSC 2.1, and their true names/names in CSC 2.0, downloaded from the [CSC 2.1 caveats page](https://cxc.cfa.harvard.edu/csc/files/CorrectedNamesCSC21.txt). This is supposed to be corrected in a future data release.
+
 ### sherpa_fitting_code
 
 This code collects all the files relevant to Seth Larner's full process of finding unabsorbed Seyfert 2 AGN. 
