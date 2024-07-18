@@ -15,15 +15,18 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     #needs a level 2 directory with a chandra evt2 file
     print('fluximaging')
     fluximage.punlearn()
+    print(dir)
     evt = glob.glob(f'{dir}/*evt2*')
+    print(evt)
     evt = unglob(evt)
+    print(evt)
     fluximage.infile=evt
     fluximage.outroot = f'{dir}/detect'
     fluximage.bands = '0.3:7.5:2.3'
     fluximage.psfecf=0.9 #one sigma of 2D gaussian (see 'running wavdetect')
     fluximage.clobber = 'yes'
     fluximage.verbose = 5
-    #print(fluximage)
+    print(fluximage)
     fluximage()
 
     print('wavdetecting')

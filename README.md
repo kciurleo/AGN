@@ -20,7 +20,7 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `false_probability_xmm.py` collects code relevant to conducting a false match probability calculation on XMM/SDSS candidates, including creating optical images of targets. 
 
-`koulouridis.py` checked that none of the [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) Seyferts were in my sample.
+`sample_comparison.py` checked that none of the [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) or [SPIDERS](https://www.sdss.org/dr18/bhm/programs/spiders/#eFEDS-Summary) Seyferts were in my sample.
 
 ### sh
 
@@ -65,6 +65,10 @@ This repository collects code relevant to my master's research on True Seyfert 2
 `not_found_obsids.txt` are obsids which, when attempting to download, say they are not found on Chandra archive. These are data which are still proprietary.
 
 `spidersros.xml` and `spidersxmm.xml` are tables resulting from queries to the associated SPIDERS (SPectroscopic IDentification of eROSITA Sources) [ROSAT](https://heasarc.gsfc.nasa.gov/db-perl/W3Browse/w3table.pl?tablehead=name%3Dspidersros&Action=More+Options) and [XMM](https://heasarc.gsfc.nasa.gov/db-perl/W3Browse/w3table.pl?tablehead=name%3Dspidersxmm&Action=More+Options) catalogs respectively, used to try to find more Seyfert candidates. In both cases, the whole catalog was downloaded as csv from linked by applying no query terms and setting the limit to "No limit."
+
+`spidersrosat_s2.csv` and `spidersxmm_s2.csv` are the RA and dec coordinates of the Seyfert 2s present in the SPIDERS catalogue, identified by "NLAGN" and used to query ChaSer.
+
+`spidersrosat_results.csv` and `spidersxmm_results.csv` are the results of a cone search of 10 arcsec around the SPIDERS Seyferts using ChaSer.
 
 `SDSS.txt` is a list of SDSS files to batch download.
 

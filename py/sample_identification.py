@@ -48,10 +48,11 @@ point_sources.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/point_sources.
 
 #Find all XMM SPIDERS 
 xspi_s2 = SPIDERSXMM.loc[(SPIDERSXMM['source_type']=="NLAGN")]
+xspi_s2[['ra', 'dec']].to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/spidersxmm_s2.csv', index=False)
 
 #Find all ROSAT SPIDERS which are point sources, and then which are S2
-rosspi_points = SPIDERSROS.loc[(SPIDERSROS['extent_likelihood']<1)]
-rosspi_s2 = rosspi_points.loc[(rosspi_points['source_type']=="NLAGN")]
+rosspi_s2 = SPIDERSROS.loc[(SPIDERSROS['source_type']=="NLAGN")]
+rosspi_s2[['ra', 'dec']].to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/spidersrosat_s2.csv', index=False)
 
 #Combined SPIDERS s2
 spi_s2 = pd.merge(rosspi_s2, xspi_s2, how="outer", on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'])
@@ -111,8 +112,7 @@ print(f'Sources matched with SDSS: {len(sources)}, {len(data)-len(sources)} not 
 print(f'Point sources: {len(point_sources)}, {len(sources)-len(point_sources)} extended sources')
 print(f'Unique point sources with exact XMM data: {len(XMM_point_sources["IAU_stripped"].unique())}')
 print()
-print(f'Unique SPIDERSROS point sources: {len(rosspi_points["name"].unique())}, {len(SPIDERSROS["name"].unique()) - len(rosspi_points["name"].unique())} sources with extent likelihood >1')
-print(f'Unique SPIDERSROS NLAGN: {len(rosspi_s2["name"].unique())}, {len(rosspi_points["name"].unique())-len(rosspi_s2["name"].unique())} non-Seyfert 2s')
+print(f'Unique SPIDERSROS NLAGN: {len(rosspi_s2["name"].unique())}, {len(SPIDERSROS["name"].unique())-len(rosspi_s2["name"].unique())} non-Seyfert 2s')
 print(f'Unique SPIDERSXMM NLAGN: {len(xspi_s2["name"].unique())}, {len(SPIDERSXMM["name"].unique())-len(xspi_s2["name"].unique())} non-Seyfert 2s')
 print(f'Total SPIDERS NLAGN: {len(spi_s2)}')
 print(f"Total SPIDERS present in CSC2.1: {len(pd.merge(spi_s2, classified_point_sources, left_on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'], right_on=['PLATE', 'MJD', 'FIBERID'],how='inner'))}")
