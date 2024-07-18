@@ -116,6 +116,7 @@ print(f'Unique SPIDERSROS NLAGN: {len(rosspi_s2["name"].unique())}, {len(rosspi_
 print(f'Unique SPIDERSXMM NLAGN: {len(xspi_s2["name"].unique())}, {len(SPIDERSXMM["name"].unique())-len(xspi_s2["name"].unique())} non-Seyfert 2s')
 print(f'Total SPIDERS NLAGN: {len(spi_s2)}')
 print(f"Total SPIDERS present in CSC2.1: {len(pd.merge(spi_s2, classified_point_sources, left_on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'], right_on=['PLATE', 'MJD', 'FIBERID'],how='inner'))}")
+print(f"Total SPIDERS present in CSC2.1 outer Seyferts: {len(pd.merge(spi_s2, outer_s2, left_on=['sdss_spec_plate_num', 'sdss_spec_mjd_num', 'sdss_spec_fiber_num'], right_on=['PLATE', 'MJD', 'FIBERID'],how='inner'))}")
 print()
 print(f'Unique unclassifiable or non-classified sources: {len(unclassified["CSC21P_name"].unique())}')
 print(f'Unique Portsmouth Seyferts: {len(portsmouth_s2["CSC21P_name"].unique())}, {len(point_sources["CSC21P_name"].unique())-len(unclassified["CSC21P_name"].unique())-len(portsmouth_s2["CSC21P_name"].unique())} classified non-Seyferts')

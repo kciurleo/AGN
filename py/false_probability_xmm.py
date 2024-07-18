@@ -130,7 +130,13 @@ for group_name, group_data in groupedtwos:
 for group_name, group_data in groupedthrees:
     get_image(np.array(group_data['specObjAll_ra']), np.array(group_data['specObjAll_dec']), 1/60, 300, group_name)
 
+plt.show()
+'''
+
+'''
+unique_XMM = XMM_result.drop_duplicates(subset=['cscra','cscdec','ra','dec'])
+for id, row in unique_XMM.iloc[61:80].iterrows():
+    get_image([row['cscra']], [row['cscdec']], 1/60, 300, [row['ra'], row['dec']])
 
 plt.show()
-
 '''
