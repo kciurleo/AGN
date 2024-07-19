@@ -133,6 +133,16 @@ for group_name, group_data in groupedthrees:
 plt.show()
 '''
 
+#For the problem children
+problem_children=pd.DataFrame([[322.481, 0.1333318], [174.5699, 21.83715], [179.1166, 55.12432], [165.0788, 10.04838], [136.8109, 52.06347], [198.0418, -1.404259]], columns=['ra', 'dec'])
+bad_guys=pd.merge(final, problem_children, on=['ra', 'dec'], how='inner')
+bad_guys=bad_guys.groupby(['ra', 'dec'])
+
+for group_name, group_data in bad_guys:
+    get_image(np.array(group_data['specObjAll_ra']), np.array(group_data['specObjAll_dec']), 1/60, 300, group_name)
+    plt.savefig(f"/Users/kciurleo/Documents/kciurleo/AGN/plots/{group_name[0]}_{group_name[1]}.pdf", format="pdf")
+plt.show()
+
 '''
 unique_XMM = XMM_result.drop_duplicates(subset=['cscra','cscdec','ra','dec'])
 for id, row in unique_XMM.iloc[61:80].iterrows():
