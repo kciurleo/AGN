@@ -4,7 +4,7 @@
 #are all in one input directory, with a pause in between.
 
 #Start directory where data is downloaded
-input_dir="/opt/pwdata/katie/csc2.1data"
+input_dir="/opt/pwdata/katie/csc2.1"
 
 #Make sure we're in ciao
 source activate ciao-4.16
@@ -23,9 +23,9 @@ for repo in "${list[@]}"; do
 
         #Pause for 2 minutes
         echo "Pausing.";
-        sleep 60;
+        #sleep 60;
         echo "Pausing.";
-        sleep 60;
+        #sleep 60;
     else
         echo "$repo already reprocessed, skipping."
     fi

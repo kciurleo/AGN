@@ -2,6 +2,8 @@ import numpy as np
 from os import path
 from os import listdir
 import sys
+import pandas as pd
+from matplotlib import pyplot as plt
 
 ####################
 #Defining functions
@@ -121,13 +123,43 @@ def is_best_unabsorbed(outroot, obsids, models):
     return best_unabsorbed_array
 
 
+def make_histograms(outroot, cstat_bins, del_cstat_bins):
+    #Makes some histograms of cstats for model cutoff purposes
+    main = pd.read_csv(f'{outroot}/allinfo_full_withratio.csv')
+    alt = pd.read_csv(f'{outroot}/allinfo_full_withratio_alt.csv')
+    res = pd.read_csv(f'{outroot}/allinfo_full_withratio_res.csv')
+    print(main.columns)
+
+    fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10,10))
+
+    ax1, ax2, ax3, ax4, ax5, ax6 = axes.flatten()
+
+    ax1.hist(pd.to_numeric(main['Cstat'], errors='coerce'), bins = cstat_bins)
+    ax1.set_ylabel('Main')
+    ax1.set_xlabel('Cstat')
+
+    ax2.hist(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'), bins = del_cstat_bins)
+    ax2.set_ylabel('Main-Alt')
+    ax2.set_xlabel('del Cstat')
+
+    ax3.hist(pd.to_numeric(alt['Cstat'], errors='coerce'), bins = cstat_bins)
+    ax3.set_ylabel('Alt')
+    ax3.set_xlabel('Cstat')
+
+    ax4.hist(pd.to_numeric(res['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'), bins = del_cstat_bins)
+    ax4.set_ylabel('Restricted-Alt')
+    ax4.set_xlabel('del Cstat')
+
+    ax5.hist(pd.to_numeric(res['Cstat'], errors='coerce'), bins = cstat_bins)
+    ax5.set_ylabel('Restricted')
+    ax5.set_xlabel('Cstat')
+
+    ax6.hist(pd.to_numeric(res['Cstat'], errors='coerce')-pd.to_numeric(main['Cstat'], errors='coerce'), bins = del_cstat_bins)
+    ax6.set_ylabel('Restricted-Main')
+    ax6.set_xlabel('del Cstat')
+
+    plt.show()
 
 if __name__ == '__main__':
-
-    data_dir = sys.argv[1]
-    outroot = sys.argv[2]
-    obsids = sys.argv[3]
-
-    print(get_triply_unabsorbed(outroot))
-
-    print(get_best_model(data_dir, obsids))
+    outroot='/Users/kciurleo/Documents/kciurleo/temporary_variable_run'
+    make_histograms(outroot, 15, 15)

@@ -20,6 +20,7 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     print(evt)
     evt = unglob(evt)
     print(evt)
+    '''
     fluximage.infile=evt
     fluximage.outroot = f'{dir}/detect'
     fluximage.bands = '0.3:7.5:2.3'
@@ -28,15 +29,19 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     fluximage.verbose = 5
     print(fluximage)
     fluximage()
+    '''
+    os.system(f'Fluximage infile={evt} outroot={dir}/detect bands="0.3:7.5:2.3" psfecf=0.9 clobber="yes" verbose = 4')
 
     print('wavdetecting')
 
     wavdetect.punlearn()
+    print(wavdetect)
     img = glob.glob(f'{dir}/*thresh.img')
     img = unglob(img)
     wavdetect.infile = img
     psf = glob.glob(f'{dir}/*thresh.psfmap')
     psf = unglob(psf)
+    '''
     wavdetect.psffile = psf
     wavdetect.outfile = f'{dir}/detect_src.fits'
     wavdetect.imagefile = f'{dir}/detect_imgfile.fits'
@@ -44,13 +49,18 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     wavdetect.defnbkgfile = f'{dir}/detect_nbgd.fits'
     wavdetect.scellfile = f'{dir}/detect_scell.fits'
     wavdetect.clobber = 'yes'
-    wavdetect.verbose = 4
+    wavdetect.verbose = 5
+    print(wavdetect)
     wavdetect()
+    '''
+    os.system(f'wavdetect infile={img} psffile={psf} outfile={dir}/detect_src.fits scales="2.0 4.0" imagefile={dir}/detect_imgfile.fits regfile={dir}/detect_src.reg defnbkgfile={dir}/detect_nbgd.fits scellfile={dir}/detect_scell.fits clobber="yes" verbose=3')
 
 
 data_dir="/opt/pwdata/katie/csc2.1"
+#data_dir='/Users/kciurleo/Documents/kciurleo/temporary_variable_run'
 
 obsids = ['12024'] #os.listdir(data_dir)
+#obsids = ['4854']
 failures = []
 
 for obsid in obsids:
