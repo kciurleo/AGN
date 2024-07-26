@@ -6,10 +6,10 @@
 
 #File with obsids listed
 #input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/havenots.txt"
-input_file="/Users/kciurleo/Documents/kciurleo/AGN/unorganized/unfound_obsids.txt"
+input_file="/Users/kciurleo/Documents/kciurleo/AGN/csvs/haves.txt"
 
 #End directory to download data into
-cd "/Volumes/lif-astro1.wesleyan.edu/astro_pwdata/katie/csc2.1data"
+cd "/opt/pwdata/katie/csc2.1"
 
 #Make sure we're in ciao
 source activate ciao-4.16

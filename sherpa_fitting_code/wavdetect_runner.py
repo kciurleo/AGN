@@ -30,7 +30,7 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     print(fluximage)
     fluximage()
     '''
-    os.system(f'Fluximage infile={evt} outroot={dir}/detect bands="0.3:7.5:2.3" psfecf=0.9 clobber="yes" verbose = 4')
+    os.system(f'Fluximage infile={evt} outroot={dir}/detect bands="0.3:7.5:2.3" psfecf=0.9 clobber="yes" verbose = 2')
 
     print('wavdetecting')
 
@@ -53,7 +53,7 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     print(wavdetect)
     wavdetect()
     '''
-    os.system(f'wavdetect infile={img} psffile={psf} outfile={dir}/detect_src.fits scales="2.0 4.0" imagefile={dir}/detect_imgfile.fits regfile={dir}/detect_src.reg defnbkgfile={dir}/detect_nbgd.fits scellfile={dir}/detect_scell.fits clobber="yes" verbose=3')
+    os.system(f'wavdetect infile={img} psffile={psf} outfile={dir}/detect_src.fits scales="2.0 4.0" imagefile={dir}/detect_imgfile.fits regfile={dir}/detect_src.reg defnbkgfile={dir}/detect_nbgd.fits scellfile={dir}/detect_scell.fits clobber="yes" verbose=2')
 
 
 data_dir="/opt/pwdata/katie/csc2.1"

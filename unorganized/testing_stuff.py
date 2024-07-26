@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import glob
 import numpy as np
+from astropy.io import fits
 '''
 needed = pd.read_csv("/Volumes/galaxies/Seth/AGNs/x-ray/final_data/all_info_final.csv").head()
 
@@ -69,7 +70,7 @@ print(len(df['Flux_OIII_5006']))
 print(len(nonzero['Flux_OIII_5006']))
 for i in range(len(set(nonzero['Flux_OIII_5006']))):
     print(list(set(nonzero['Flux_OIII_5006']))[i])
-'''
+
 data = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv')
 names = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CorrectedNamesCSC21.txt', skiprows=1, names=['current name', 'corrected name'])
 
@@ -92,3 +93,14 @@ for i in np.array(names['corrected name']):
     anybody._append(row)
 
 print(anybody)
+
+#print(fits.getdata('/opt/pwdata/katie/csc2.1/10125/repro/acisf10125_reset_evt1.fits')['STATUS'])
+#data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv', low_memory=False)
+'''
+import pandas as pd
+import os
+in_there = os.listdir('/opt/pwdata/katie/csc2.1')
+did_we_delete_these=pd.read_csv("/Users/kciurleo/Documents/kciurleo/AGN/csvs/haves.txt",names=['obsid'])['obsid']
+
+print(set(in_there).intersection(set(did_we_delete_these)))
+print(len(did_we_delete_these))
