@@ -102,5 +102,11 @@ import os
 in_there = os.listdir('/opt/pwdata/katie/csc2.1')
 did_we_delete_these=pd.read_csv("/Users/kciurleo/Documents/kciurleo/AGN/csvs/haves.txt",names=['obsid'])['obsid']
 
-print(set(in_there).intersection(set(did_we_delete_these)))
-print(len(did_we_delete_these))
+#print(set(in_there).intersection(set(did_we_delete_these)))
+#print(len(did_we_delete_these))
+
+seyferts = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/obsids_seyferts.csv')
+print(len(seyferts['CSC21P_name']))
+print(len(seyferts['CHANDRA_OBSID'].unique()))
+new_seyferts = seyferts.drop_duplicates(subset=['CHANDRA_OBSID','CSC21P_name', 'ra_x', 'dec_x', 'Z'])
+new_seyferts.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/full_process_input.csv')

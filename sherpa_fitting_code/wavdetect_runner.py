@@ -59,11 +59,12 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
 data_dir="/opt/pwdata/katie/csc2.1"
 #data_dir='/Users/kciurleo/Documents/kciurleo/temporary_variable_run'
 
-obsids = ['12024'] #os.listdir(data_dir)
+obsids = os.listdir(data_dir)
 #obsids = ['4854']
 failures = []
+second_half = obsids[int(len(obsids)/2):]
 
-for obsid in obsids:
+for obsid in second_half:
     print(f'Wavdetecting {obsid}')
     try:
         dir = f'{data_dir}/{obsid}/primary'
