@@ -97,6 +97,7 @@ interest = pd.merge(potential_variables, obsids, on='CSC21P_name')
 interest = interest.drop_duplicates(subset=['CSC21P_name', 'ra_x', 'dec_x','CHANDRA_OBSID'])
 #interest.to_csv('/Users/kciurleo/Documents/kciurleo/temporary_variable_run/coords.csv', index=False)
 
+'''
 #Which (temporary) guys have fluxes greater than their eROSITA upper limits?
 temporary_variable_run = pd.read_csv('/Users/kciurleo/Documents/kciurleo/temporary_variable_run/final_data/final_info_full.csv')
 
@@ -136,3 +137,36 @@ unique_summed = summed.drop_duplicates(subset=['# ObsID', 'IAUstripped'])
 #unique_summed.to_csv('/Users/kciurleo/Documents/kciurleo/temporary_variable_run/final_data/unique_summed.csv', index=False)
 
 print(unique_summed[['IAUstripped', '# ObsID', 'model', 'counts', 'Sum flux', 'med_excess_yes']])
+'''
+
+#Which guys have fluxes greater than their eROSITA upper limits?
+full_run = pd.read_csv('/opt/pwdata/katie/csc2.1/final_data/final_info_full.csv')
+
+new_interest = pd.merge(full_run, full_data, left_on=['CXO name'], right_on=['CSC21P_name'], how='left')
+
+new_interest[['Soft flux', 'Medium flux', 'Hard flux', 'Sum flux']] = new_interest[['Soft flux', 'Medium flux', 'Hard flux', 'Sum flux']].apply(pd.to_numeric, errors='coerce', downcast='float')
+
+#Soft 
+soft = new_interest.loc[new_interest['Soft flux']>new_interest['UL_B_021']]
+
+#Medium
+medium = new_interest.loc[new_interest['Medium flux']>new_interest['UL_B_022']]
+
+#Hard
+hard = new_interest.loc[new_interest['Hard flux']>new_interest['UL_B_023']]
+
+#Summed
+summed = new_interest.loc[new_interest['Sum flux']>new_interest['UL_B_02e']]
+
+#Total unique
+total_unique = set(soft["CSC21P_name"]) | set(medium["CSC21P_name"]) | set(hard["CSC21P_name"]) | set(summed["CSC21P_name"])
+
+print(f'There are {len(soft["CSC21P_name"].unique())} unique objects whose soft flux exceeds their eROSITA upper limit.')
+print(soft["CSC21P_name"].unique())
+print(f'There are {len(medium["CSC21P_name"].unique())} unique objects whose medium flux exceeds their eROSITA upper limit.')
+print(medium["CSC21P_name"].unique())
+print(f'There are {len(hard["CSC21P_name"].unique())} unique objects whose hard flux exceeds their eROSITA upper limit.')
+print(hard["CSC21P_name"].unique())
+print(f'There are {len(summed["CSC21P_name"].unique())} unique objects whose summed flux exceeds their eROSITA upper limit.')
+print(summed["CSC21P_name"].unique())
+print(f'There are {len(total_unique)} unique objects whose flux exceeds at least one eROSITA upper limit.')

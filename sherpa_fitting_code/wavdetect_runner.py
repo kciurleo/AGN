@@ -30,7 +30,7 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     print(fluximage)
     fluximage()
     '''
-    os.system(f'Fluximage infile={evt} outroot={dir}/detect bands="0.3:7.5:2.3" psfecf=0.9 clobber="yes" verbose = 2')
+    os.system(f'Fluximage infile={evt} outroot={dir}/detect bands="0.3:7.5:2.3" psfecf=0.9 clobber="yes" verbose = 4')
 
     print('wavdetecting')
 
@@ -53,7 +53,7 @@ def detect(dir): #detect is used to run fluximage and wavdetect in sequence on a
     print(wavdetect)
     wavdetect()
     '''
-    os.system(f'wavdetect infile={img} psffile={psf} outfile={dir}/detect_src.fits scales="2.0 4.0" imagefile={dir}/detect_imgfile.fits regfile={dir}/detect_src.reg defnbkgfile={dir}/detect_nbgd.fits scellfile={dir}/detect_scell.fits clobber="yes" verbose=2')
+    os.system(f'wavdetect infile={img} psffile={psf} outfile={dir}/detect_src.fits scales="2.0 4.0" imagefile={dir}/detect_imgfile.fits regfile={dir}/detect_src.reg defnbkgfile={dir}/detect_nbgd.fits scellfile={dir}/detect_scell.fits clobber="yes" verbose=4')
 
 
 data_dir="/opt/pwdata/katie/csc2.1"
@@ -64,7 +64,9 @@ obsids = os.listdir(data_dir)
 failures = []
 second_half = obsids[int(len(obsids)/2):]
 
-for obsid in second_half:
+this_one=['404']
+
+for obsid in this_one:
     print(f'Wavdetecting {obsid}')
     try:
         dir = f'{data_dir}/{obsid}/primary'
