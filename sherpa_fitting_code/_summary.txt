@@ -1,0 +1,11 @@
+
+
+Summary of source fluxes
+
+      Position                               0.5 - 7.0 keV                           
+                                             Value        90% Conf Interval          
+#0001|0 7 37.35 +2 2 47.2     Rate           NAN c/s (NAN,NAN)                       
+ Outside FOV                  Flux           NAN erg/cm2/s (NAN,NAN)                 
+                              Mod.Flux       NAN erg/cm2/s (NAN,NAN)                 
+                              Unabs Mod.Flux NAN erg/cm2/s (NAN,NAN)                 
+
