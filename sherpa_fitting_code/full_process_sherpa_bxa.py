@@ -488,7 +488,7 @@ def main():
                 data_out_nh[i,1] = obsid
 
                 #if we need to copy the
-                if obsid[-1] in alphabet and not path.exists(f'{data_dir}/{obsid}'):
+                if obsid[-1] in alphabet and not path.exists(unglob(glob.glob(f'{data_dir}/{obsid}/primary/*evt2*'))):
                     print(f'Copying to {obsid}')
                     cp_command = f'cp -R {data_dir}/{obsid[:-1]} {data_dir}/{obsid}'
                     os.system(cp_command)
