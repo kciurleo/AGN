@@ -488,7 +488,7 @@ def main():
                 data_out_nh[i,1] = obsid
 
                 #if we need to copy the
-                if obsid[-1] in alphabet and not path.exists(unglob(glob.glob(f'{data_dir}/{obsid}/primary/*evt2*'))):
+                if obsid[-1] in alphabet and not path.exists(f'{data_dir}/{obsid}'):
                     print(f'Copying to {obsid}')
                     cp_command = f'cp -R {data_dir}/{obsid[:-1]} {data_dir}/{obsid}'
                     os.system(cp_command)
@@ -539,7 +539,7 @@ def main():
                 try:
                     regphystocel()
                 except OSError:
-                    no_matches_doc.write(f'regphystocel failed for {ob}\n')
+                    no_matches_doc.write(f'\n{ob}')
                     continue
 
                 regiontxt = np.loadtxt(all_region_sky,dtype='str',skiprows=3)
@@ -583,7 +583,7 @@ def main():
                         if dec[0] != '-':
                             pm = '+'
                         else:
-                            pm = None
+                            pm = ''
                         coord_str = f'{ra} {pm}{dec}' #formats the string to be passed to pyasl
                         ra,dec = pyasl.coordsSexaToDeg(coord_str)
                         #now we are ready to test
