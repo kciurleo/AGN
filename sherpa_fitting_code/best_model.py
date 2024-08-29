@@ -83,7 +83,7 @@ def get_best_model(data_dir, obsids):
             best_models.append('ERROR')
 
         #If alt model has better stat than main, then pick that
-        elif stat_alt != 'ERROR' and stat != 'ERROR' and stat - stat_alt>0.5:
+        elif stat_alt != 'ERROR' and stat != 'ERROR' and stat - stat_alt>5:
             best_models.append('alt')
 
         #Else if main model's slope is physical, then pick that
