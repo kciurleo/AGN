@@ -22,6 +22,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `srcflux_runner.py` runs the Ciao tool `srcflux` on the match errors identified by the full process fitting code to see if they're low count sources.
 
+`xray_followup.py` identifies minimally absorbed AGN which have not yet been observed with XMM.
+
 ### sh
 
 `find_obsid_given_name.sh` takes in a file with IAU names, then spits out a new file with the chandra OBSIDs (and dates and lengths/times) for those objects.
@@ -97,6 +99,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 `visual_match_error.csv` is used as input for `ds9_checker.sh` and contains information for a small subsample of the match errors meant to be inspected visually.
 
 `match_error_srcflux.csv` is the output of `srcflux_runner.py`, used to diagnose why so many sources have match errors. It has information (exposure time, off axis angle, count, MJD, etc) for all match errors.
+
+`unobserved_full_info.csv` is a list of minimally absorbed AGN unobserved with XMM, created in `xray_followup.py`.
 
 ### sherpa_fitting_code
 

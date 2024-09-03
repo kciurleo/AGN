@@ -1,3 +1,7 @@
+#This py file looks at the match errors identified by the sherpa fitting code full process and extracts the counts from
+#a specific region around the source, based on its off-axis angle, to assess the hypothesis that the match errors are
+#low count sources.
+
 import numpy as np
 import pandas as pd
 import os
