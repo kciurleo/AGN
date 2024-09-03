@@ -12,8 +12,6 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `eROSITA.py` contains the beginnings of eROSITA-relevant code, including rough calculations regarding the process of comparing eROSITA upper limits to Chandra fluxes.
 
-`useful_functions.py` contains functions used across the repository.
-
 `bpt.py` makes BPT diagrams of the CSC2.1 targets, along with Seyfert candidates.
 
 `targetmap.py` makes a map of the CSC2.1 targets, along with Seyfert candidates.
@@ -21,6 +19,8 @@ This repository collects code relevant to my master's research on True Seyfert 2
 `false_probability_xmm.py` collects code relevant to conducting a false match probability calculation on XMM/SDSS candidates, including creating optical images of targets. 
 
 `sample_comparison.py` checked that none of the [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) or [SPIDERS](https://www.sdss.org/dr18/bhm/programs/spiders/#eFEDS-Summary) Seyferts were in my sample.
+
+`srcflux_runner.py` runs the Ciao tool `srcflux` on the match errors identified by the full process fitting code to see if they're low count sources.
 
 ### sh
 
@@ -35,6 +35,12 @@ This repository collects code relevant to my master's research on True Seyfert 2
 `post_async.sh` makes an asynchronous request to a catalogue with the query in a given text file; initially set up for the XMM EPIC catalogue, and should in theory work for eROSITA, but currently doesn't.
 
 `repro_chandra.sh` reprocesses large amounts of Chandra data, assuming files are all in one input directory.
+
+`deleter.sh` deleted all the data originally moved over from Seth's downloaded data, such that they can be redownloaded from the CSC to avoid having to reprocess everything.
+
+`check_non_download.sh` checks sources which failed during wavdetect to see if their folders are empty for some reason and downloads the obsids if so.
+
+`ds9_checker.sh` and `ds9_energy_filtering.sh` create pngs of sources with match errors, including both the regions created by wavdetect and the location of the source for visual inspection of the errors. The latter also limits the energy to between 0.3-8 keV to reduce noise.
 
 ### csvs
 
@@ -56,7 +62,7 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `seyferts.csv` and `seyferts.vot` are identical subsets of `full_point_sources.csv` made up of any sources classified as a Seyfert by either Agostino or Portsmouth. The latter contains only a select few of the columns of the former.
 
-`obsids_seyferts.csv` is a table of all Chandra obsids which contain sources identified as potential Seyferts, along with the observations' dates and exposure lengths, and is merged with `seyferts.csv` such that each source-obsid pair is listed once. This is created in `find_obsid_given_name.sh`.
+`obsids_seyferts.csv` is a table of all Chandra obsids which contain sources identified as potential Seyferts, along with the observations' dates and exposure lengths, and is merged with `seyferts.csv`. This is created in `find_obsid_given_name.sh`.
 
 `source_info_obsid_unique_seth.txt` is a table of Seyfert candidates previously identified by Seth Larner which were a useful comparison to Seyfert candidates identified in `seyferts.csv`.
 
@@ -78,11 +84,19 @@ This repository collects code relevant to my master's research on True Seyfert 2
 
 `XMM_query_result.vot` is the downloaded result of the cone search of XMM around the candidates described by `post_async.sh`, with a search radius of 10".
 
+`falsematchtest.csv` is the downloaded result of a cone search of SDSS around all XMM targets with a search radius of 15", to be used to see if a false match probability calculation for XMM is needed.
+
 `koulouridis.csv` and `koulouridis_coordinates.csv` are identical sets of Seyfert 2 AGN identified by [Koulouridis et al.](https://www.aanda.org/articles/aa/abs/2016/02/aa26515-15/aa26515-15.html) using XMM and were used to query ChaSer for matching observations. The latter contains only the RA and Dec columns needed for such a query.
 
 `koulouridis_results.csv` are the results of a cone search of 10 arcsec around the Koulouridis Seyferts using ChaSer.
 
 `CorrectedNamesCSC21.txt` contains a list of 400 CSC2.1 objects which were given new names in CSC 2.1, and their true names/names in CSC 2.0, downloaded from the [CSC 2.1 caveats page](https://cxc.cfa.harvard.edu/csc/files/CorrectedNamesCSC21.txt). This is supposed to be corrected in a future data release.
+
+`full_process_input.csv` is `obsids_seyferts.csv` but with duplicate rows dropped based on the subset of columns including 'CHANDRA_OBSID', 'CSC21P_name', 'ra_x', 'dec_x', 'Z', to be used to run `full_process_sherpa_bxa.py`. This dropping of duplicates was necessary because `obsids_seyferts.csv` had come from a dataframe which originally had been merged with the XMM catalogue and therefore might have multiple rows with the same obsid-object combo but different XMM objects; this file contains exactly one row for each obsid-object combo.
+
+`visual_match_error.csv` is used as input for `ds9_checker.sh` and contains information for a small subsample of the match errors meant to be inspected visually.
+
+`match_error_srcflux.csv` is the output of `srcflux_runner.py`, used to diagnose why so many sources have match errors. It has information (exposure time, off axis angle, count, MJD, etc) for all match errors.
 
 ### sherpa_fitting_code
 
@@ -103,6 +117,7 @@ This subdirectory contains:
 * `run_stat_test_fp.py` and `cstat_goodness.py` are relevant to Cstat, goodness of fit.
 * `cosmo_calc` and `calc_cosmos_for_fp.` find distance/luminosity for a target, using cosmological redshift.
 * `collate_for_fp.py` and `make_stat_table.py` help create csv files of different information.
+* `solving_my_own_mysteries.ipynb` is an unorganized notebook temporarily in this folder to make use of functions in `best_model`, meant to understand the output of the full process code.
 
 ### Other Folders
 
