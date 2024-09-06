@@ -158,8 +158,22 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     ax6.set_ylabel('Restricted-Main')
     ax6.set_xlabel('del Cstat')
 
+    #plt.savefig(f'{outroot}/cstat_histograms.pdf', format='pdf')
+    plt.show()
+
+    #Extra stuff to describe later
+    mean=np.mean(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'))
+    std_dev = np.std(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'))
+    print(mean)
+    print(mean+3*std_dev)
+
+    plt.figure(figsize=(8,6))
+    plt.hist(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'), bins = del_cstat_bins*3)
+    plt.ylabel('Main-Alt')
+    plt.xlabel('del Cstat')
+    plt.xlim(-20,20)
     plt.show()
 
 if __name__ == '__main__':
-    outroot='/Users/kciurleo/Documents/kciurleo/temporary_variable_run'
-    make_histograms(outroot, 15, 15)
+    outroot='/opt/pwdata/katie/csc2.1/'
+    make_histograms(outroot, 40, 40)

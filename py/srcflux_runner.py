@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 #Read all the match errors in, along with all the info about them
 match_error = pd.read_csv('/opt/pwdata/katie/csc2.1/matching_error.txt', skiprows=1, names=['ids', 'date', 'exp', 'theta'])
-final_list=pd.read_csv('/opt/pwdata/katie/csc2.1/data_full.txt', skiprows=1, delimiter='  ',names=['NAME','OBSID','RA', 'DEC', 'Z', 'nH', 'COUNTS'])
+final_list=pd.read_csv('/opt/pwdata/katie/csc2.1/data_full.txt', skiprows=1, delimiter='  ',engine='python',names=['NAME','OBSID','RA', 'DEC', 'Z', 'nH', 'COUNTS'])
 match_error_full_info = pd.DataFrame(columns=final_list.columns)
 
 #Empty columns
@@ -20,7 +20,10 @@ dates = []
 exps = []
 thetas = []
 radii = []
+counts = []
+
 problem_list = []
+srcflux_error_list = []
 
 #Get the exposure time, date, and off-axis angle for all the matching errors
 print('Getting fits info and off axis angle')
@@ -80,24 +83,35 @@ for number, row in match_error_full_info.iterrows():
     except:
         continue
     
-    os.chdir(f'/opt/pwdata/katie/csc2.1/{row["OBSID"]}/primary')
-    
-    print('writing reg files for ',row["OBSID"])
-    
-    srcfile = 'testsrc.reg'
-    bkgfile = 'testbkg.reg'
+    try:
+        #don't run if it already did
+        count = glob.glob(f'/opt/pwdata/katie/csc2.1/{row["OBSID"]}/primary/counts/*.flux')[0]
+        print(f'Found file {count}, srcflux already run')
 
-    with open(srcfile, 'w') as regfile:
-        regfile.write(f'circle({row["RA"]}d,{row["DEC"]}d,{row["radius"]}\")')
+    except:
 
-    with open(bkgfile, 'w') as regfile2:
-        regfile2.write(f'annulus({row["RA"]}d,{row["DEC"]}d,{row["radius"]}\",{1.5*row["radius"]}\")')
+        os.chdir(f'/opt/pwdata/katie/csc2.1/{row["OBSID"]}/primary')
+        
+        print('writing reg files for ',row["OBSID"])
+        
+        srcfile = 'testsrc.reg'
+        bkgfile = 'testbkg.reg'
 
-    print('srcfluxing ',row["OBSID"])
-    srcflux.punlearn()
-    srcflux(f'{file}[energy=300:7500]', pos=f'{row["RA"]}, {row["DEC"]}', srcreg=srcfile, bkgreg=bkgfile, outroot=f"/opt/pwdata/katie/csc2.1/{row['OBSID']}/primary/counts/", psfmethod="quick", clobber="yes") 
+        with open(srcfile, 'w') as regfile:
+            regfile.write(f'circle({row["RA"]}d,{row["DEC"]}d,{row["radius"]}\")')
 
-    counts = []
+        with open(bkgfile, 'w') as regfile2:
+            regfile2.write(f'annulus({row["RA"]}d,{row["DEC"]}d,{row["radius"]}\",{1.5*row["radius"]}\")')
+
+        print('srcfluxing ',row["OBSID"])
+        try:
+            srcflux.punlearn()
+            srcflux(f'{file}[energy=300:7500]', pos=f'{row["RA"]}, {row["DEC"]}', srcreg=srcfile, bkgreg=bkgfile, outroot=f"/opt/pwdata/katie/csc2.1/{row['OBSID']}/primary/counts/", psfmethod="quick", clobber="yes") 
+        except:
+            srcflux_error_list.append(row["OBSID"])
+            continue
+
+print(f'srcflux error list: {srcflux_error_list}')
 
 #Get the counts from the correct files
 for number, row in match_error_full_info.iterrows():
@@ -127,7 +141,7 @@ match_error_full_info['counts']=counts
 match_error_full_info.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/match_error_srcflux.csv', index=False)
 
 plt.figure(figsize=(8,6))
-plt.hist(match_error_full_info['counts'], bins=30)
+plt.hist(match_error_full_info['counts'], bins=40)
 plt.title('Matching Errors - Individual Source Detection')
 plt.xlabel('Counts')
 plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/matching_error.pdf", format="pdf")
