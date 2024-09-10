@@ -43,16 +43,29 @@ for i, row in triply_unabsorbed_list.iterrows():
 #print(triply_unabsorbed_list[['ids','model','CXO name','RA','Dec','counts',' OBSDATE',' TIME','MJD','FIBERID','PLATE','IAUNAME','duration','ra','dec']])
 
 unobserved_list=[]
+observed_list=[]
 for i, row in triply_unabsorbed_list.iterrows():
     #if nan for xmm duration, add to a list of unobserved targets
     if pd.isna(row['duration']):
         unobserved_list.append(row['ids'])
+    else:
+        observed_list.append(row['ids'])
 
 #save a version of final_full with just the unobserved guys
 unobserved_info_full = pd.DataFrame(columns=final_full.columns)
+#observed_info_full = pd.DataFrame(columns=final_full.columns)
 
 for obsid in unobserved_list:
     temp_row_dude=final_full.loc[final_full['# ObsID']==f'{obsid}']
     unobserved_info_full = pd.concat([unobserved_info_full, temp_row_dude], ignore_index=True)
 
 unobserved_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/unobserved_full_info.csv',index=False)
+print(unobserved_info_full)
+
+#same for observed
+for obsid in observed_list:
+    temp_row_dude=final_full.loc[final_full['# ObsID']==f'{obsid}']
+    observed_info_full = pd.concat([observed_info_full, temp_row_dude], ignore_index=True)
+
+observed_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/observed_full_info.csv',index=False)
+#print(observed_info_full)

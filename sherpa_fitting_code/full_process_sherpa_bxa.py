@@ -1018,11 +1018,11 @@ def main():
     
     #Identify compton thick sources
     print('Finding compton thick targets.')
-    compton = final_data.loc[final_data['compton thick']==True]
+    compton = final_data.loc[final_data['compton thick']=='True']
     with open(f'{outroot}/final_data/final_compton_list.txt', 'w') as compton_file:
         compton_file.write('#The following sources are compton thick:')
         for id, name in enumerate(compton['CXO name']):
-            final_min_abs_file.write(f"\n{name}")
+            compton_file.write(f"\n{name}")
 
     #Find the triply unabsorbed targets, ignoring compton thick sources; this is sort of a silly thing.
     print('Finding triply unabsorbed targets.')
