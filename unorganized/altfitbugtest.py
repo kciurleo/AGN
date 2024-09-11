@@ -16,3 +16,4 @@ obsids=dude["OBSID"]
 models=best_model.get_best_model('/opt/pwdata/katie/csc2.1','/opt/pwdata/katie/csc2.1',obsids)
 dude['model']=models
 print(len(dude.loc[dude['model']=='alt']))
+print(len(dude.loc[dude['model']!='ERROR']))
