@@ -950,7 +950,7 @@ def main():
     ####################
     #Determine best model for all targets
     print('Finding best models.')
-    best_models = get_best_model(data_dir, yes_matches)
+    best_models = get_best_model(data_dir, outroot, yes_matches)
 
 
     ####################

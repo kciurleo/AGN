@@ -12,13 +12,13 @@ def read_doc_simple(file_path):
     with open(file_path,'r') as file:
         data_list = file.read().split('\n')
 
-    stat = data_list[15]
+    cstat = data_list[1]
     gamma = data_list[7]
 
     try:
-        return float(stat), float(gamma)
+        return float(cstat), float(gamma)
     except:
-        return stat,gamma
+        return cstat,gamma
 
 def triply_unabsorbed(outroot, obsids):
     #For a list of obsids, return a list of those unabsorbed in all three models
@@ -55,10 +55,18 @@ def get_triply_unabsorbed(outroot):
     
     return unabsorbed_list
 
-def get_best_model(data_dir, obsids):
+def get_best_model(data_dir, outroot, obsids):
     #Determine which fit is the best for a given obsid; iterate over all list
 
     best_models = []
+
+    #Find 3 sigma cutoff for main vs alt fit
+    main = pd.read_csv(f'{outroot}/allinfo_full_withratio.csv')
+    alt = pd.read_csv(f'{outroot}/allinfo_full_withratio_alt.csv')
+    mean=np.mean(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'))
+    std_dev = np.std(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'))
+
+    cutoff = mean + 3 * std_dev
 
     for obsid in obsids:
         file = f'{data_dir}/{obsid}/primary/sherpaout.txt'
@@ -77,13 +85,13 @@ def get_best_model(data_dir, obsids):
             stat_alt,gamma_alt = read_doc_simple(alt_file)
         except (FileNotFoundError, IndexError):
             stat_alt,gamma_alt = ('ERROR','ERROR')
-
+        
         #Return error if all stats are error
         if stat == 'ERROR' and stat_alt == 'ERROR' and stat_res == 'ERROR':
             best_models.append('ERROR')
 
         #If alt model has better stat than main, then pick that
-        elif stat_alt != 'ERROR' and stat != 'ERROR' and stat - stat_alt>5:
+        elif stat_alt != 'ERROR' and stat != 'ERROR' and stat - stat_alt > cutoff:
             best_models.append('alt')
 
         #Else if main model's slope is physical, then pick that

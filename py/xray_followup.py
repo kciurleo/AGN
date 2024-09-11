@@ -53,14 +53,16 @@ for i, row in triply_unabsorbed_list.iterrows():
 
 #save a version of final_full with just the unobserved guys
 unobserved_info_full = pd.DataFrame(columns=final_full.columns)
-#observed_info_full = pd.DataFrame(columns=final_full.columns)
+observed_info_full = pd.DataFrame(columns=final_full.columns)
 
 for obsid in unobserved_list:
     temp_row_dude=final_full.loc[final_full['# ObsID']==f'{obsid}']
     unobserved_info_full = pd.concat([unobserved_info_full, temp_row_dude], ignore_index=True)
 
 unobserved_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/unobserved_full_info.csv',index=False)
-print(unobserved_info_full)
+print(unobserved_info_full[['# ObsID', 'unabsorbed', 'model', 'Cstat', 'nH', 'nH error plus',
+       'nH error minus', 'gamma', 'gamma error plus', 'gamma error minus','CXO name', 'RA', 'Dec', 'Z', 'galactic nH', 'counts',
+       'luminosity', 'luminosity error']])
 
 #same for observed
 for obsid in observed_list:
@@ -69,3 +71,6 @@ for obsid in observed_list:
 
 observed_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/observed_full_info.csv',index=False)
 #print(observed_info_full)
+
+print(len(unobserved_info_full['CXO name'].unique()))
+print(len(observed_info_full['CXO name'].unique()))
