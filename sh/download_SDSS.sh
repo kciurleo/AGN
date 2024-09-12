@@ -13,6 +13,6 @@ directory="/Volumes/galaxies/Katie/SDSS_data/"
 cd "$directory"
 
 #Try eBOSS
-wget  -nv -r -nH --cut-dirs=7 \
+wget  --spider -nv -r -nH --cut-dirs=7 \
 -i "$spectra" \
 -B "https://data.sdss.org/sas/dr17/eboss/spectro/redux/v5_13_2/spectra/full/"
