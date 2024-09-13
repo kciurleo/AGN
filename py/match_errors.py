@@ -44,17 +44,20 @@ match_errors['PRESENT']=presents
 #print(match_errors)
 
 '''
-'''
+
 #Those who are present or not in their FOV
 present = match_errors.loc[match_errors['PRESENT']==True]
 not_present = match_errors.loc[match_errors['PRESENT']==False]
 
-#Unique targets present
+#Unique targets 
 present_unique=present.drop_duplicates(subset=['NAME'])
+not_present_unique=not_present.drop_duplicates(subset=['NAME'])
 
 #Whether those targets which are present have another obsid which they might have matched
 present_only_one=present_unique.loc[present_unique['NUM']==1]
 present_multiple=present_unique.loc[present_unique['NUM']>1]
+not_present_only_one=not_present_unique.loc[not_present_unique['NUM']==1]
+not_present_multiple=not_present_unique.loc[not_present_unique['NUM']>1]
 
 #Check to make sure all the guys who have multiple have at least one obs where they were matched
 yes_list=[]
@@ -67,11 +70,23 @@ for i, row in present_multiple.iterrows():
             yes_list.append(row['NAME'])
             break
 
+second_yes_list=[]
+
+for i, row in not_present_multiple.iterrows():
+    subdude=final_list.loc[final_list['NAME']==row['NAME']]
+    for i2, row2 in subdude.iterrows():
+        #As long as one of the obsids has counts instead of 'no match' we're good
+        if row2['COUNTS']!='NO MATCH':
+            second_yes_list.append(row['NAME'])
+            break
+
 #Those whose multiples have at least one obs where they were matched
 safe_present_multiple = present_multiple[present_multiple['NAME'].isin(yes_list)]
+safe_not_present_multiple = not_present_multiple[not_present_multiple['NAME'].isin(second_yes_list)]
 
 #Those who don't
 bad_present_multiple = present_multiple[~present_multiple['NAME'].isin(yes_list)]
+bad_not_present_multiple = not_present_multiple[~not_present_multiple['NAME'].isin(second_yes_list)]
 
 #Those who are present in their FOV who have no matched obsids at all
 all_naughty_guys = bad_present_multiple.merge(present_only_one, how='outer')
@@ -85,6 +100,12 @@ print()
 print(f'Of those with multiple observations, {len(safe_present_multiple["NAME"])} have at least one observation which was matched.')
 print(f'{len(bad_present_multiple["NAME"])} had match errors for all their multiple observations.')
 print()
+print(f'Of those obsid-object combos not present in their observations, there are {len(not_present_unique["NAME"])} unique objects.')
+print(f'Out of these unique objects, {len(not_present_only_one["NAME"])} are the only observation of their object and {len(not_present_multiple["NAME"])} objects have other observations.')
+print()
+print(f'Of those with multiple observations, {len(safe_not_present_multiple["NAME"])} have at least one observation which was matched.')
+print(f'{len(bad_not_present_multiple["NAME"])} had match errors for all their multiple observations.')
+print()
 print(f'There are therefore {len(all_naughty_guys["NAME"])} objects which are present on their chips but are unmatched in all their observations (either one or multiple).')
 
 plt.figure(figsize=(8,6))
@@ -93,7 +114,9 @@ plt.title('Matching Errors - Present Fully Unmatched Objects')
 plt.xlabel('Counts')
 plt.show()
 
-'''
+#check the date for all the bright ones
+print(all_naughty_guys.loc[all_naughty_guys['counts']>25][['NAME','OBSID','date']])
+print(bad_not_present_multiple[['NAME','OBSID','date']])
 '''
 #Get the band counts for chandra from csc2.1 file
 combined_match_errors=pd.merge(match_errors, csc21, how="left", left_on='NAME', right_on="CSC21P_name")
