@@ -95,7 +95,7 @@ def get_best_model(data_dir, outroot, obsids):
             best_models.append('alt')
 
         #Else if main model's slope is physical, then pick that
-        elif gamma != 'ERROR' and gamma < 2.2 and gamma > 1.7:
+        elif gamma != 'ERROR' and gamma < 2.2 and gamma > 1.5:
             best_models.append('main')
 
         #Otherwise, return restricted, provided there's no error
@@ -136,8 +136,20 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     main = pd.read_csv(f'{outroot}/allinfo_full_withratio.csv')
     alt = pd.read_csv(f'{outroot}/allinfo_full_withratio_alt.csv')
     res = pd.read_csv(f'{outroot}/allinfo_full_withratio_res.csv')
-    print(main.columns)
+    final_full = pd.read_csv('/opt/pwdata/katie/csc2.1/final_data/final_info_full.csv')
 
+
+    alt=final_full.loc[final_full['model']=='alt']
+
+    new_main=main.loc[~main['CXO name'].isin(alt['CXO name'])]
+ 
+    plt.figure(figsize=(8,8))
+    plt.hist(pd.to_numeric(new_main['gamma'], errors='coerce'), bins=100)
+    plt.axvline(1.7, color='black')
+    plt.axvline(2.2, color='black')
+    plt.xlabel('Gamma')
+    plt.show()
+    '''
     fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10,10))
 
     ax1, ax2, ax3, ax4, ax5, ax6 = axes.flatten()
@@ -181,6 +193,7 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     plt.xlabel('del Cstat')
     plt.xlim(-20,20)
     plt.show()
+    '''
 
 if __name__ == '__main__':
     outroot='/opt/pwdata/katie/csc2.1/'

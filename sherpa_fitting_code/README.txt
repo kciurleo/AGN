@@ -17,4 +17,4 @@ E.g. if you don\'92t have a chaser file:
 
 Or for the full data
 
-	python /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/full_process_sherpa_bxa.py /opt/pwdata/katie/rerunning_seth_data /opt/pwdata/katie/rerunning_seth_data /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/seth_full_list.csv 'no' 'no' 'no' 'no' 'no' 'no'
+	python /Users/kciurleo/Documents/kciurleo/AGN/sherpa_fitting_code/full_process_sherpa_bxa.py /opt/pwdata/katie/csc2.1 /opt/pwdata/katie/csc2.1 /Users/kciurleo/Documents/kciurleo/AGN/csvs/full_process_input.csv 'no' 'no' 'no' 'no' 'no' 'no'
