@@ -74,3 +74,57 @@ observed_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/observed_
 
 print(len(unobserved_info_full['CXO name'].unique()))
 print(len(observed_info_full['CXO name'].unique()))
+
+
+#Redoing the above but for all the guys
+dates=[]
+exps=[]
+
+#merge with cone list so we can have all the info
+final_min_abs=pd.merge(final_min_abs, cone_result, how='left', left_on='CXO name', right_on='CSC21P_name')
+
+#gotta get rid of some duplicates when it comes to the chandra obsids being listed multiple times in input
+for i, row in final_min_abs.iterrows():
+    if row['# ObsID'][-1] in ['a','b','c','d','e','f','g']:
+        id = row['# ObsID'][:-1]
+    else:
+        id=row['# ObsID']
+    if int(id)!=int(row['CHANDRA_OBSID']):
+        final_min_abs=final_min_abs.drop(i)
+
+#rest of the duplicates should be for xmm reasons
+#print(final_min_abs[['# ObsID','model','CXO name','RA','Dec','counts',' OBSDATE',' TIME','MJD','FIBERID','PLATE','IAUNAME','duration','ra','dec']])
+
+unobserved_list=[]
+observed_list=[]
+for i, row in final_min_abs.iterrows():
+    #if nan for xmm duration, add to a list of unobserved targets
+    if pd.isna(row['duration']):
+        unobserved_list.append(row['# ObsID'])
+    else:
+        observed_list.append(row['# ObsID'])
+
+#save a version of final_full with just the unobserved guys
+unobserved_info_full = pd.DataFrame(columns=final_full.columns)
+observed_info_full = pd.DataFrame(columns=final_full.columns)
+
+for obsid in unobserved_list:
+    temp_row_dude=final_full.loc[final_full['# ObsID']==f'{obsid}']
+    unobserved_info_full = pd.concat([unobserved_info_full, temp_row_dude], ignore_index=True)
+
+unobserved_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_unobserved_full_info.csv',index=False)
+print(unobserved_info_full[['# ObsID', 'unabsorbed', 'model', 'Cstat', 'nH', 'nH error plus',
+       'nH error minus', 'gamma', 'gamma error plus', 'gamma error minus','CXO name', 'RA', 'Dec', 'Z', 'galactic nH', 'counts',
+       'luminosity', 'luminosity error']])
+
+#same for observed
+for obsid in observed_list:
+    temp_row_dude=final_full.loc[final_full['# ObsID']==f'{obsid}']
+    observed_info_full = pd.concat([observed_info_full, temp_row_dude], ignore_index=True)
+
+observed_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_observed_full_info.csv',index=False)
+#print(observed_info_full)
+
+print(len(unobserved_info_full['CXO name'].unique()))
+print(len(observed_info_full['CXO name'].unique()))
+print(len(final_min_abs['CXO name'].unique()))
