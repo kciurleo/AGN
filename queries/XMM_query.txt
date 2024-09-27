@@ -1,5 +1,5 @@
 SELECT 
-    dr13.srcid,dr13.detid,dr13.observation_id,dr13.observation_oid,dr13.ra,dr13.dec,dr13.duration,dr13.IAUNAME,
+    dr13.srcid,dr13.src_num,dr13.detid,dr13.observation_id,dr13.observation_oid,dr13.ra,dr13.dec,dr13.duration,dr13.IAUNAME,
     my_cat.ra,my_cat.dec,my_cat.IAUstripped,my_cat.MJD,my_cat.FIBERID,my_cat.PLATE
 FROM 
     xsa.v_epic_source_cat AS dr13 
