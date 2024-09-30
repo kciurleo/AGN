@@ -10,6 +10,7 @@ import tarfile
 import requests
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+import numpy as np
 
 #Input file
 input=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_observed_full_info.csv')
@@ -50,7 +51,8 @@ def extract_all_files(tar_file_path, extract_to):
 def match_sourceno(obsid, ra, dec):
     '''
     For a given directory and an ra and dec point, sort through the directory
-    to find the source that's the closest. Return the source number and main file.
+    to find the source that's the closest. Return the source number and main file,
+    and the value of min sep in arcmin.
     '''
 
     #look at all the source spectra
@@ -73,9 +75,11 @@ def match_sourceno(obsid, ra, dec):
 
     #look at the file at that index and get just the numbers trailing SRSPEC, minus the .FTZ ending
     sourceno=filelist[min_index].split('SRSPEC')[1][:-4]
-    print('sourceno: ',sourceno)
-
-    return(sourceno, filelist[min_index], min_sep)
+    
+    if np.isnan(min_sep):
+        raise ValueError 
+    else: 
+        return(sourceno, filelist[min_index], min_sep.to(u.arcmin).value)
 
 ###
 #Full Code Start
@@ -93,10 +97,14 @@ badlist=[]
 badsrcnolist=[]
 badrmflist=[]
 
+input['download error'] = False
+
 #Iterate over the obsids, and download all ftz files
-for id, row in input.head(25).iterrows():
+for id, row in input.iterrows():
     #skip the skiplist guy(s) for now:
     if row['observation_id'] in skiplist:
+        #set it as an error temporarily
+        input.loc[id, 'download error'] = True
         continue
 
     #needs to have 10 digits
@@ -118,6 +126,7 @@ for id, row in input.head(25).iterrows():
     except:
         print(f'ERROR downloading {obsid}.')
         badlist.append(obsid)
+        input.loc[id, 'download error'] = True
         continue
     
     #Match the source to its proper XMM detected source
@@ -126,44 +135,52 @@ for id, row in input.head(25).iterrows():
     except:
         print(f'ERROR matching {obsid}.')
         badsrcnolist.append(obsid)
+        input.loc[id, 'download error'] = True
         continue
 
     #Open the correct fits header to see what the response file is
     respfile=fits.getheader(f'{dir}/{main_file}',ext=1)['RESPFILE']
-
-    #try to request new url, if fails (aka not status 200), request old one
-    url = f'https://sasdev-xmm.esac.esa.int/pub/ccf/constituents/extras/responses/PN/{respfile}'
     
-    # Send a GET request to the URL
-    response = requests.get(url)
-    
-    # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        with open(f'{dir}/{obsid}/pps/{respfile}', 'wb') as file:
-            file.write(response.content)
-        print("File downloaded successfully from new PN")
-    else:
-        print('Failed to download rmf from new PN, trying old PN')
-        sasvers = fits.getheader(main_file, ext=0)['SASVERS'].split('-')[1]
-        url = f'https://sasdev-xmm.esac.esa.int/pub/ccf/constituents/extras/responses/old/pn/{sasvers_dict[sasvers]}{respfile.split(".")[0]}_v{sasvers[:-2]}.rmf'
+    #Download if not already downloaded
+    if len(glob.glob(f'{obsid}/pps/*{respfile}*'))==0 and len(glob.glob(f'{obsid}/pps/*{respfile.split(".")[0]}*'))==0:
+        #try to request new url, if fails (aka not status 200), request old one
+        url = f'https://sasdev-xmm.esac.esa.int/pub/ccf/constituents/extras/responses/PN/{respfile}'
+        
+        #Send a GET request to the URL
         response = requests.get(url)
         
+        #Check if the request was successful (status code 200)
         if response.status_code == 200:
-            with open(f'{dir}/{obsid}/pps/{respfile}', 'wb') as file:
-                file.write(response.content)
-            print("File downloaded successfully from old PN")
+            with open(f'{dir}/{obsid}/pps/{respfile}', 'wb') as file1:
+                file1.write(response.content)
+            print("File downloaded successfully from new PN")
         else:
-            badrmflist.append(url)
-            print("Couldn't find rmf.")
+            print('Failed to download rmf from new PN, trying old PN')
+            sasvers = fits.getheader(main_file, ext=0)['SASVERS'].split('-')[1]
+            url = f'https://sasdev-xmm.esac.esa.int/pub/ccf/constituents/extras/responses/old/pn/{sasvers_dict[sasvers]}{respfile.split(".")[0]}_v{sasvers[:-2]}.rmf'
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                with open(f'{dir}/{obsid}/pps/{respfile}', 'wb') as file2:
+                    file2.write(response.content)
+                print("File downloaded successfully from old PN")
+            else:
+                badrmflist.append(url)
+                input.loc[id, 'download error'] = True
+                print("Couldn't find rmf.")
+    else:
+        print('rmf file already downloaded.')
 
-    #KATIE HERE'S WHERE YOU DELETE EXTRA FILES
-    #savelist: anything with.rmf, anything with the src_num string in it
+    #Delete extra files in the repository
+    for filename in glob.glob(f'{obsid}/pps/*'):
+        if not (f'{src_num}.FTZ' in filename or '.rmf' in filename):
+            os.remove(filename)
 
-    #KATIE you should also save these "minimum separations" somewhere, let's remember that
+    #save the "minimum separations" and other errors
+    input.loc[id, 'min_sep']= min_sep
+    input.loc[id, 'actual src_num']=src_num
 
-    #delete this later, this is just for fun to check it's actually working
-    clean()
-    load_pha(main_file)
+input.to_csv(f'{dir}/xmm_download_output.csv',index=False)
 
 print(f'Bad list is {len(badlist)} items.')
 print(f'Bad srcno list is {len(badsrcnolist)} items.')
