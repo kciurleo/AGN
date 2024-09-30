@@ -114,8 +114,8 @@ for obsid in unobserved_list:
     temp_row_dude=final_min_abs.loc[final_min_abs['# ObsID']==f'{obsid}']
     unobserved_info_full = pd.concat([unobserved_info_full, temp_row_dude], ignore_index=True)
     
-#Make sure we're only saving the unique obsID, XMM obsid, srcid combos
-unobserved_info_full=unobserved_info_full.drop_duplicates(subset=['# ObsID', 'observation_id', 'srcid'])
+#Make sure we're only saving the unique chandra object, XMM obsid, srcid combos
+unobserved_info_full=unobserved_info_full.drop_duplicates(subset=['CXO name', 'observation_id', 'srcid'])
 unobserved_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_unobserved_full_info.csv',index=False)
 #print(unobserved_info_full[['# ObsID', 'unabsorbed', 'model', 'Cstat', 'nH', 'nH error plus', 'nH error minus', 'gamma', 'gamma error plus', 'gamma error minus','CXO name', 'RA', 'Dec', 'Z', 'galactic nH', 'counts', 'luminosity', 'luminosity error']])
 
@@ -124,8 +124,8 @@ for obsid in observed_list:
     temp_row_dude=final_min_abs.loc[final_min_abs['# ObsID']==f'{obsid}']
     observed_info_full = pd.concat([observed_info_full, temp_row_dude], ignore_index=True)
 
-#Make sure we're only saving the unique obsID, XMM obsid, srcid combos
-observed_info_full=observed_info_full.drop_duplicates(subset=['# ObsID', 'observation_id', 'srcid'])
+#Make sure we're only saving the unique chandra object, XMM obsid, srcid combos
+observed_info_full=observed_info_full.drop_duplicates(subset=['CXO name', 'observation_id', 'srcid'])
 observed_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_observed_full_info.csv',index=False)
 
 print(len(unobserved_info_full['CXO name'].unique()))

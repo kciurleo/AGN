@@ -77,21 +77,28 @@ def match_sourceno(obsid, ra, dec):
 
     return(sourceno, filelist[min_index], min_sep)
 
+###
+#Full Code Start
+###
+
 #Move into the downloads
 os.chdir(dir)
 
-#probably should do the id thing of abcdefg
-'''
-thought is to edit the obsid column s.t. if there's a duplicate, add a b c etc
-then below, make one obsid which is the repository name and one obsid variable which is the true num to post or use for globing etc
-'''
+#Unlike with the chandra obsids, there's not a lot of overlap to need to do the alphabet thing for duplicates;
+#only one guy, which we'll just skip and do manually at the end for now.
+skiplist=[203280201]
 
+#Lists for our iteration
 badlist=[]
 badsrcnolist=[]
 badrmflist=[]
 
 #Iterate over the obsids, and download all ftz files
 for id, row in input.head(25).iterrows():
+    #skip the skiplist guy(s) for now:
+    if row['observation_id'] in skiplist:
+        continue
+
     #needs to have 10 digits
     obsid = str(row['observation_id']).zfill(10)
     print(f'Downloading {obsid}')
@@ -102,7 +109,7 @@ for id, row in input.head(25).iterrows():
         if not os.path.exists(f'{dir}/{obsid}'):
             XMMNewton.download_data(obsid, level='PPS', extension='FTZ')
 
-            #Extract files and delete
+            #Extract files and delete the big tar
             print(f'Extracting {obsid}')
             extract_all_files(f'{obsid}.tar', '')
             os.remove(f"{obsid}.tar") 
@@ -114,17 +121,16 @@ for id, row in input.head(25).iterrows():
         continue
     
     #Match the source to its proper XMM detected source
-    src_num, main_file, min_sep = match_sourceno(obsid, row['ra'], row['dec'])
-
-    #Open the correct fits header to see what the srcnumber and response files are
     try:
-        print(f'{dir}/{main_file}')
-        respfile=fits.getheader(f'{dir}/{main_file}',ext=1)['RESPFILE']
+        src_num, main_file, min_sep = match_sourceno(obsid, row['ra'], row['dec'])
     except:
-        print(f'ERROR finding src no {src_num}.')
+        print(f'ERROR matching {obsid}.')
         badsrcnolist.append(obsid)
         continue
-    
+
+    #Open the correct fits header to see what the response file is
+    respfile=fits.getheader(f'{dir}/{main_file}',ext=1)['RESPFILE']
+
     #try to request new url, if fails (aka not status 200), request old one
     url = f'https://sasdev-xmm.esac.esa.int/pub/ccf/constituents/extras/responses/PN/{respfile}'
     
@@ -139,9 +145,7 @@ for id, row in input.head(25).iterrows():
     else:
         print('Failed to download rmf from new PN, trying old PN')
         sasvers = fits.getheader(main_file, ext=0)['SASVERS'].split('-')[1]
-        print(sasvers[:-2])
         url = f'https://sasdev-xmm.esac.esa.int/pub/ccf/constituents/extras/responses/old/pn/{sasvers_dict[sasvers]}{respfile.split(".")[0]}_v{sasvers[:-2]}.rmf'
-        print(url)
         response = requests.get(url)
         
         if response.status_code == 200:
