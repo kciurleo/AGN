@@ -148,7 +148,20 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     plt.axvline(1.7, color='black')
     plt.axvline(2.2, color='black')
     plt.xlabel('Gamma')
+    plt.show(block=False)
+
+    interesting_guys=new_main.loc[(new_main['gamma']!='ERROR')]
+    interesting_guys=interesting_guys.loc[(interesting_guys['gamma'].astype(float)>1.5) & (interesting_guys['gamma'].astype(float)<2.2)]
+
+    print('mean: ',np.nanmean(interesting_guys['gamma error plus'].astype(float)))
+    print('median: ',np.nanmedian(interesting_guys['gamma error plus'].astype(float)))
+    print('std: ',np.std(interesting_guys['gamma error plus'].astype(float)))
+
+    plt.figure(figsize=(8,8))
+    plt.hist(interesting_guys['gamma error plus'].astype(float), bins=40)
+    plt.xlabel('Gamma error')
     plt.show()
+
     '''
     fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10,10))
 
