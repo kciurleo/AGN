@@ -131,3 +131,18 @@ observed_info_full.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_obser
 print(len(unobserved_info_full['CXO name'].unique()))
 print(len(observed_info_full['CXO name'].unique()))
 print(len(final_min_abs['CXO name'].unique()))
+
+#Find all the guys for which all the chandra observations are less than 100 or 300 counts
+low_count_unobserved_names=[]
+for i in range(len(unobserved_info_full['CXO name'].unique())):
+    name=unobserved_info_full['CXO name'].unique()[i]
+
+    df=final_full.loc[final_full['CXO name']==name]
+    if (df['counts'] < 300).all():
+        low_count_unobserved_names.append(name)
+
+low_count_unobserved = final_min_abs.loc[final_min_abs['CXO name'].isin(low_count_unobserved_names)]
+low_count_unobserved.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/low_count_unobserved.csv',index=False)
+
+print(low_count_unobserved)
+print(len(low_count_unobserved['CXO name'].unique()))
