@@ -58,6 +58,8 @@ fmeds=[]
 fhards=[]
 fsums=[]
 
+counts=[]
+
 #Iterate over each row and do the fitting
 for id, row in input.iterrows():
     nH=row['galactic nH']
@@ -98,18 +100,29 @@ for id, row in input.iterrows():
     plt.savefig(f'{dir}/{obsid}/pps/sherpa_fit_resid_xmm.pdf')
 
     #Get errors
-    conf()
-    res = get_conf_results()
+    try:
+        conf()
+        res = get_conf_results()
 
-    #nH
-    int_nH = res.parvals[res.parnames.index('abs2.nH')]
-    int_nH_error_up = res.parmaxes[res.parnames.index('abs2.nH')]
-    int_nH_error_down = res.parmins[res.parnames.index('abs2.nH')]
+        #nH
+        int_nH = res.parvals[res.parnames.index('abs2.nH')]
+        int_nH_error_up = res.parmaxes[res.parnames.index('abs2.nH')]
+        int_nH_error_down = res.parmins[res.parnames.index('abs2.nH')]
 
-    #gamma
-    gamma = res.parvals[res.parnames.index('p1.PhoIndex')]
-    gamma_error_up = res.parmaxes[res.parnames.index('p1.PhoIndex')]
-    gamma_error_down = res.parmins[res.parnames.index('p1.PhoIndex')]
+        #gamma
+        gamma = res.parvals[res.parnames.index('p1.PhoIndex')]
+        gamma_error_up = res.parmaxes[res.parnames.index('p1.PhoIndex')]
+        gamma_error_down = res.parmins[res.parnames.index('p1.PhoIndex')]
+    except:
+        #error in fit s.t. the reduced statistic is bonkers high. return to this later. for now banish them to the shadow realm.
+        int_nH = 'ERROR'
+        int_nH_error_up = 'ERROR'
+        int_nH_error_down = 'ERROR'
+
+        #gamma
+        gamma = 'ERROR'
+        gamma_error_up = 'ERROR'
+        gamma_error_down = 'ERROR'
 
     #flux calculations, need to edit
     #get energy in keV
@@ -129,8 +142,16 @@ for id, row in input.iterrows():
     gamma_agree = 'ERROR'
     nH_agree = 'ERROR'
 
-    gamma_agree = agreement(gamma, [gamma_error_up,gamma_error_down], row['gamma'], row[['gamma error plus', 'gamma error minus']])
+    if row['model'] == 'res':
+        #make the chandra gamma errors 0
+        gamma_agree = agreement(gamma, [gamma_error_up,gamma_error_down], row['gamma'], [0])
+    else:
+        gamma_agree = agreement(gamma, [gamma_error_up,gamma_error_down], row['gamma'], row[['gamma error plus', 'gamma error minus']])
+    
     nH_agree = agreement(int_nH, [int_nH_error_up,int_nH_error_down], row['nH'], row[['nH error plus', 'nH error minus']])
+
+    #get total counts of the object
+    count=np.sum(fits.getdata(filename,ext=1)['COUNTS'])
 
     #write out a text file with the info
     variables = {
@@ -147,7 +168,8 @@ for id, row in input.iterrows():
     'xmm soft flux': fsoft,
     'xmm med flux': fmed,
     'xmm hard flux': fhard,
-    'xmm soft flux': fsum
+    'xmm soft flux': fsum,
+    'xmm counts': count
     }
 
     # Specify the file name
@@ -175,6 +197,7 @@ for id, row in input.iterrows():
     fhards.append(fhard)
     fsums.append(fsum)
 
+    counts.append(count)
     #write the other values too
 
 #add all the new columns
@@ -194,6 +217,8 @@ input['xmm sum flux']=fsums
 
 input['gamma agree'] = gamma_agrees
 input['nH agree'] = nH_agrees
+
+input['xmm counts'] = counts
 
 input.to_csv(f'{dir}/xmm_sherpa_out.csv', index=False)
 

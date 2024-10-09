@@ -12,6 +12,9 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 import numpy as np
 
+#should you redownload files we already did this for?
+redo_download = True
+
 #Input file
 input=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/ALL_observed_full_info.csv')
 
@@ -63,8 +66,12 @@ def match_sourceno(obsid, ra, dec):
     ras=[]
     decs=[]
     for file in filelist:
-        ras.append(fits.getheader(file,ext=1)['SRC_RA'])
-        decs.append(fits.getheader(file,ext=1)['SRC_DEC'])
+        try:
+            ras.append(fits.getheader(file,ext=1)['SRC_RA'])
+            decs.append(fits.getheader(file,ext=1)['SRC_DEC'])
+        except:
+            ras.append(np.nan)
+            decs.append(np.nan)
 
     #get min separation with astropy coords
     point = SkyCoord(ra=ra * u.degree, dec=dec * u.degree, frame='icrs')
@@ -79,7 +86,7 @@ def match_sourceno(obsid, ra, dec):
     if np.isnan(min_sep):
         raise ValueError 
     else: 
-        return(sourceno, filelist[min_index], min_sep.to(u.arcmin).value)
+        return(sourceno, filelist[min_index], min_sep.to(u.arcsec).value)
 
 ###
 #Full Code Start
@@ -114,7 +121,7 @@ for id, row in input.iterrows():
     #Download everything
     try:
         #Don't download it if it's already there
-        if not os.path.exists(f'{dir}/{obsid}'):
+        if redo_download or not os.path.exists(f'{dir}/{obsid}'):
             XMMNewton.download_data(obsid, level='PPS', extension='FTZ')
 
             #Extract files and delete the big tar
@@ -131,7 +138,7 @@ for id, row in input.iterrows():
     
     #Match the source to its proper XMM detected source
     try:
-        src_num, main_file, min_sep = match_sourceno(obsid, row['ra'], row['dec'])
+        src_num, main_file, min_sep = match_sourceno(obsid, row['RA'], row['Dec'])
     except:
         print(f'ERROR matching {obsid}.')
         badsrcnolist.append(obsid)
