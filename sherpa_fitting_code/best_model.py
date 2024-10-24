@@ -142,14 +142,14 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     alt=final_full.loc[final_full['model']=='alt']
 
     new_main=main.loc[~main['CXO name'].isin(alt['CXO name'])]
- 
+
     plt.figure(figsize=(8,8))
     plt.hist(pd.to_numeric(new_main['gamma'], errors='coerce'), bins=100)
     plt.axvline(1.7, color='black')
     plt.axvline(2.2, color='black')
     plt.xlabel('Gamma')
-    plt.show(block=False)
-
+    plt.show()
+    '''
     interesting_guys=new_main.loc[(new_main['gamma']!='ERROR')]
     interesting_guys=interesting_guys.loc[(interesting_guys['gamma'].astype(float)>1.5) & (interesting_guys['gamma'].astype(float)<2.2)]
 
@@ -161,7 +161,7 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     plt.hist(interesting_guys['gamma error plus'].astype(float), bins=40)
     plt.xlabel('Gamma error')
     plt.show()
-
+    '''
     '''
     fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10,10))
 
@@ -208,6 +208,129 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     plt.show()
     '''
 
+def diagnose_best_fit(outroot):
+    def agreement(value1, errors1, value2, errors2):
+        '''
+        takes in two values and their associated errors array
+        (upper and lower) and uses the maximum magnitude error
+        (because I don't trust some of this) to check if errors
+        overlap
+        '''
+        try:
+            errors1 = np.asarray(errors1, dtype=float)
+            errors2 = np.asarray(errors2, dtype=float)
+            lower_bound1 = value1 - np.nanmax(np.abs(errors1[~np.isnan(errors1)]))
+            upper_bound1 = value1 + np.nanmax(np.abs(errors1[~np.isnan(errors1)]))
+            lower_bound2 = value2 - np.nanmax(np.abs(errors2[~np.isnan(errors2)]))
+            upper_bound2 = value2 + np.nanmax(np.abs(errors2[~np.isnan(errors2)]))
+
+            if upper_bound1 < lower_bound2 or upper_bound2 < lower_bound1:
+                return False  
+            else:
+                return True
+        except Exception as e:
+            print(f"Error type: {type(e).__name__}, Message: {e}")
+    
+    main = pd.read_csv(f'{outroot}/allinfo_full_withratio.csv')
+    alt = pd.read_csv(f'{outroot}/allinfo_full_withratio_alt.csv')
+    res = pd.read_csv(f'{outroot}/allinfo_full_withratio_res.csv')
+    final_full = pd.read_csv('/opt/pwdata/katie/csc2.1/final_data/final_info_full.csv')
+
+
+    alt=final_full.loc[final_full['model']=='alt']
+
+    new_main=main.loc[~main['CXO name'].isin(alt['CXO name'])]
+    
+    T=0
+    F=0
+    Errors=0
+    sucked=0
+    trues = []
+
+    for id, row in new_main.iterrows():
+        print(id)
+        errors=[]
+        try:
+            errors.append(float(row['gamma error plus']))
+        except:
+            pass
+        try:
+            errors.append(float(['gamma error minus']))
+        except:
+            pass
+        if len(errors)>0:
+            print(errors)
+            print(row['gamma error minus'])
+            agree=agreement(1.95, [0.25], float(row['gamma']), errors)
+        else:
+            agree='ERROR'
+            sucked+=1
+
+        if agree=='ERROR':
+            print(errors)
+            Errors+=1
+        elif agree==True:
+            T+=1
+            trues.append(row['# ObsID'])
+        else:
+            F+=1
+    print(f'True: {T}, False: {F}, Errors: {Errors}, sucked {sucked}')
+
+    T1=0
+    F1=0
+    Errors1=0
+    sucked1=0
+    trues1 = []
+
+    for id, row in new_main.iterrows():
+        print(id)
+        errors=[]
+        try:
+            errors.append(float(row['gamma error plus']))
+        except:
+            pass
+        try:
+            errors.append(float(['gamma error minus']))
+        except:
+            pass
+        if len(errors)>0:
+            print(errors)
+            print(row['gamma error minus'])
+            agree=agreement(1.9, [0], float(row['gamma']), errors)
+        else:
+            agree='ERROR'
+            sucked1+=1
+
+        if agree=='ERROR':
+            print(errors)
+            Errors1+=1
+        elif agree==True:
+            T1+=1
+            trues1.append(row['# ObsID'])
+        else:
+            F1+=1
+    print(f'True: {T1}, False: {F1}, Errors: {Errors1}, sucked {sucked1}')
+
+
+    interesting_guys=new_main.loc[(new_main['gamma']=='ERROR')]
+    print(len(interesting_guys['gamma']))
+    print(trues)
+    basicagreementdudes=main.loc[main['# ObsID'].isin(trues1)]
+    agreementdudes=main.loc[main['# ObsID'].isin(trues)]
+
+    plt.figure(figsize=(10,6))
+    plt.hist(pd.to_numeric(new_main['gamma'], errors='coerce'), bins=100, label='All Main Fits')
+    plt.hist(pd.to_numeric(agreementdudes['gamma'], errors='coerce'), bins=100, label='Errors agree with 1.9')
+    plt.hist(pd.to_numeric(basicagreementdudes['gamma'], errors='coerce'), bins=100, alpha=0.5, label='Errors agree with 1.7-2.2')
+    plt.axvline(1.7, color='black', label='Original cutoff (1.7-2.2)')
+    plt.axvline(2.2, color='black')
+    plt.axvline(1.5, color='black', linestyle='dashed', label='Current cutoff (1.5-2.2)')
+    plt.xlabel('Gamma')
+    plt.legend()
+    plt.title('Main fit gamma, Bins=100')
+    plt.savefig('/Users/kciurleo/Documents/kciurleo/AGN/plots/histogram_gamma_main.pdf', format="pdf")
+    plt.show()
+
 if __name__ == '__main__':
     outroot='/opt/pwdata/katie/csc2.1/'
-    make_histograms(outroot, 40, 40)
+    diagnose_best_fit(outroot)
