@@ -132,9 +132,18 @@ plt.show()
 fig, axs = plt.subplots(1, 3, figsize=(20, 6), sharey=True, gridspec_kw={'wspace': 0.1})
 
 #NII
+axs[0].scatter(np.log10(full_point_sources['Flux_NII_6583']/full_point_sources['Flux_Ha_6562']),
+               np.log10(full_point_sources['Flux_OIII_5006']/full_point_sources['Flux_Hb_4861']),
+               s=4, c='gray', marker='.', alpha=0.25, label='CSC Point Sources')
+axs[0].scatter(np.log10(agostino_s2['Flux_NII_6583']/agostino_s2['Flux_Ha_6562']),
+               np.log10(agostino_s2['Flux_OIII_5006']/agostino_s2['Flux_Hb_4861']),
+               marker='.', s=4, c='blue', label='Agostino', alpha=0.5)
+axs[0].scatter(np.log10(portsmouth_s2['Flux_NII_6583']/portsmouth_s2['Flux_Ha_6562']),
+               np.log10(portsmouth_s2['Flux_OIII_5006']/portsmouth_s2['Flux_Hb_4861']),
+               marker='.', s=4, c='red', label='Portsmouth', alpha=0.5)
 axs[0].scatter(np.log10(full_min_abs['Flux_NII_6583']/full_min_abs['Flux_Ha_6562']),
                np.log10(full_min_abs['Flux_OIII_5006_x']/full_min_abs['Flux_Hb_4861']),
-               s=4, c='red', marker='.', alpha=1, label='Min Abs AGN Candidates')
+               s=8, c='black', marker='*', alpha=1, label='Min Abs AGN Candidates')
 axs[0].plot(kxNII, ke01NII, color='black', linestyle='dashed', label='Ke01')
 axs[0].plot(kaxNII, ka03NII, color='black', linestyle='dotted', label='Ka03')
 axs[0].set_xlabel("log([NII]λ6583/Hα)", fontsize=14)
@@ -145,9 +154,18 @@ axs[0].set_ylim(-2,2.5)
 axs[0].legend(loc='lower left')
 
 #SII
+axs[1].scatter(np.log10((full_point_sources['Flux_SII_6730']+full_point_sources['Flux_SII_6716'])/full_point_sources['Flux_Ha_6562']),
+               np.log10(full_point_sources['Flux_OIII_5006']/full_point_sources['Flux_Hb_4861']),
+               marker='.', s=4, color='gray', alpha=0.25, label='CSC Point Sources')
+axs[1].scatter(np.log10((agostino_s2['Flux_SII_6730']+agostino_s2['Flux_SII_6716'])/agostino_s2['Flux_Ha_6562']),
+               np.log10(agostino_s2['Flux_OIII_5006']/agostino_s2['Flux_Hb_4861']),
+               marker='.', s=4, c='blue', label='Agostino', alpha=0.5)
+axs[1].scatter(np.log10((portsmouth_s2['Flux_SII_6730']+portsmouth_s2['Flux_SII_6716'])/portsmouth_s2['Flux_Ha_6562']),
+               np.log10(portsmouth_s2['Flux_OIII_5006']/portsmouth_s2['Flux_Hb_4861']),
+               marker='.', s=4, c='red', label='Portsmouth', alpha=0.5)
 axs[1].scatter(np.log10((full_min_abs['Flux_SII_6730']+full_min_abs['Flux_SII_6716'])/full_min_abs['Flux_Ha_6562']),
                np.log10(full_min_abs['Flux_OIII_5006_x']/full_min_abs['Flux_Hb_4861']),
-               marker='.', s=4, color='red', alpha=1, label='Min Abs AGN Candidates')
+               marker='*', s=8, color='black', alpha=1, label='Min Abs AGN Candidates')
 axs[1].plot(kxSII, ke01SII, color='black', linestyle='dashed', label='Maximum Starburst')
 axs[1].plot(slxSII, slSII, color='black', linestyle='-.', label='Seyfert-LINER')
 axs[1].set_xlabel("log(([SII]λ6716 + [SII]λ6730)/Hα)", fontsize=14)
@@ -156,9 +174,18 @@ axs[1].set_ylim(-2,2.5)
 axs[1].legend(loc='lower left')
 
 #OI
+axs[2].scatter(np.log10((full_point_sources['Flux_OI_6363'])/full_point_sources['Flux_Ha_6562']),
+               np.log10(full_point_sources['Flux_OIII_5006']/full_point_sources['Flux_Hb_4861']),
+               marker='.', s=4, color='gray', alpha=0.25, label='CSC Point Sources')
+axs[2].scatter(np.log10((agostino_s2['Flux_OI_6363'])/agostino_s2['Flux_Ha_6562']),
+               np.log10(agostino_s2['Flux_OIII_5006']/agostino_s2['Flux_Hb_4861']),
+               marker='.', s=4, c='blue', label='Agostino', alpha=0.5)
+axs[2].scatter(np.log10((portsmouth_s2['Flux_OI_6363'])/portsmouth_s2['Flux_Ha_6562']),
+               np.log10(portsmouth_s2['Flux_OIII_5006']/portsmouth_s2['Flux_Hb_4861']),
+               marker='.', s=4, c='red', label='Portsmouth', alpha=0.5)
 axs[2].scatter(np.log10((full_min_abs['Flux_OI_6363'])/full_min_abs['Flux_Ha_6562']),
                np.log10(full_min_abs['Flux_OIII_5006_x']/full_min_abs['Flux_Hb_4861']),
-               marker='.', s=4, color='red', alpha=1, label='Min Abs AGN Candidates')
+               marker='*', s=8, color='black', alpha=1, label='Min Abs AGN Candidates')
 axs[2].plot(kxOI, ke01OI, color='black', linestyle='dashed', label='Maximum Starburst')
 axs[2].plot(slxOI, slOI, color='black', linestyle='-.', label='Seyfert-LINER')
 axs[2].set_xlabel("log([OI]λ6363/Hα)", fontsize=14)
@@ -166,5 +193,5 @@ axs[2].set_xlim(-3, 0.75)
 axs[2].set_ylim(-2,2.5)
 axs[2].legend(loc='lower left')
 
-#plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/min_abs_bpt.pdf", format="pdf")
+plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/min_abs_bpt_v2.pdf", format="pdf")
 plt.show()

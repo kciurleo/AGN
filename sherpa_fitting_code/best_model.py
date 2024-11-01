@@ -320,8 +320,8 @@ def diagnose_best_fit(outroot):
 
     plt.figure(figsize=(10,6))
     plt.hist(pd.to_numeric(new_main['gamma'], errors='coerce'), bins=100, label='All Main Fits')
-    plt.hist(pd.to_numeric(agreementdudes['gamma'], errors='coerce'), bins=100, label='Errors agree with 1.9')
-    plt.hist(pd.to_numeric(basicagreementdudes['gamma'], errors='coerce'), bins=100, alpha=0.5, label='Errors agree with 1.7-2.2')
+    plt.hist(pd.to_numeric(agreementdudes['gamma'], errors='coerce'), bins=100, label='Errors agree with 1.7-2.2')
+    plt.hist(pd.to_numeric(basicagreementdudes['gamma'], errors='coerce'), bins=100, alpha=0.5, label='Errors agree with 1.9')
     plt.axvline(1.7, color='black', label='Original cutoff (1.7-2.2)')
     plt.axvline(2.2, color='black')
     plt.axvline(1.5, color='black', linestyle='dashed', label='Current cutoff (1.5-2.2)')
