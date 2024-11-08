@@ -196,5 +196,6 @@ cbar = fig.colorbar(sm, ax=ax, label='Counts')
 ax.set_xlabel('(h-m)/(h+m)')
 ax.set_ylabel('(m-s)/(m+s)')
 ax.legend(loc='upper left')
-
+ax.set_title('Color-color Diagram of Match Errors')
+plt.savefig('/Users/kciurleo/Documents/kciurleo/AGN/plots/mattch_error_cc.pdf', format='pdf')
 plt.show()
