@@ -760,23 +760,25 @@ def main():
     #Call the fitting function to fit
     print('Fitting...')
     i = 0
-    #Edited 7/3/2024
-    #with open(f'{outroot}_fitting_error.txt','w') as error_doc:
-    with open(f'{outroot}/fitting_error.txt','w') as error_doc:
-    #End edit
-        error_doc.write('#Records obsids which errored during fitting.')
-        for o, z, n in zip(o_out,z_out,n_out):
-            print(f'Fitting {o}, {i+1} of {len(o_out)}')
-            dir = f'{data_dir}/{o}/primary'
-            already_fit = path.exists(f'{dir}/sherpaout.txt') and path.exists(f'{dir}/sherpaout_alt.txt') and path.exists(f'{dir}/sherpaout_restricted.txt')
-            try:
-                if fit_clobber == 'yes' or not already_fit:
-                    get_abs(n,z,dir)
-                    get_abs_alt(n,z,dir)
-                    get_abs_restricted(n,z,dir)
-            except:
-                error_doc.write(f'{o}\n')
-            i += 1
+    #delete later:
+    if fit_clobber == 'yes':
+        #Edited 7/3/2024
+        #with open(f'{outroot}_fitting_error.txt','w') as error_doc:
+        with open(f'{outroot}/fitting_error.txt','w') as error_doc:
+        #End edit
+            error_doc.write('#Records obsids which errored during fitting.')
+            for o, z, n in zip(o_out,z_out,n_out):
+                print(f'Fitting {o}, {i+1} of {len(o_out)}')
+                dir = f'{data_dir}/{o}/primary'
+                already_fit = path.exists(f'{dir}/sherpaout.txt') and path.exists(f'{dir}/sherpaout_alt.txt') and path.exists(f'{dir}/sherpaout_restricted.txt')
+                try:
+                    if fit_clobber == 'yes' or not already_fit:
+                        get_abs(n,z,dir)
+                        get_abs_alt(n,z,dir)
+                        get_abs_restricted(n,z,dir)
+                except:
+                    error_doc.write(f'{o}\n')
+                i += 1
 
 
     ##############

@@ -21,22 +21,22 @@ def read_doc_simple(file_path):
     try:
         cstat=float(c)
     except:
-        cstat=c
+        cstat=np.nan
     
     try:
         gamma=float(g)
     except:
-        gamma=g
+        gamma=np.nan
 
     try:
         errorup=float(eup)
     except:
-        errorup=eup
+        errorup=np.nan 
 
     try:
         errordown=float(edown)
     except:
-        errordown=edown
+        errordown=np.nan
 
     return cstat,gamma,errorup,errordown
 
