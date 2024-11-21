@@ -12,13 +12,33 @@ def read_doc_simple(file_path):
     with open(file_path,'r') as file:
         data_list = file.read().split('\n')
 
-    cstat = data_list[1]
-    gamma = data_list[7]
+    c = data_list[1]
+    g = data_list[7]
+    eup = data_list[9].split()[1]
+    edown = data_list[9].split()[0] #note: this is a negative number
+
+    #try to cast as floats for all of them
+    try:
+        cstat=float(c)
+    except:
+        cstat=c
+    
+    try:
+        gamma=float(g)
+    except:
+        gamma=g
 
     try:
-        return float(cstat), float(gamma)
+        errorup=float(eup)
     except:
-        return cstat,gamma
+        errorup=eup
+
+    try:
+        errordown=float(edown)
+    except:
+        errordown=edown
+
+    return cstat,gamma,errorup,errordown
 
 def triply_unabsorbed(outroot, obsids):
     #For a list of obsids, return a list of those unabsorbed in all three models
@@ -74,17 +94,17 @@ def get_best_model(data_dir, outroot, obsids):
         res_file = f'{data_dir}/{obsid}/primary/sherpaout_restricted.txt'
 
         try:
-            stat,gamma = read_doc_simple(file)
+            stat,gamma,errorup,errordown = read_doc_simple(file)
         except (FileNotFoundError, IndexError):
-            stat,gamma = ('ERROR','ERROR')
+            stat,gamma, errorup,errordown = ('ERROR','ERROR','ERROR','ERROR')
         try:
-            stat_res,gamma_res = read_doc_simple(res_file)
+            stat_res,gamma_res,errorup_res,errordown_res = read_doc_simple(res_file)
         except (FileNotFoundError, IndexError):
-            stat_res,gamma_res = ('ERROR','ERROR')
+            stat_res,gamma_res,errorup_res,errordown_res = ('ERROR','ERROR','ERROR','ERROR')
         try:
-            stat_alt,gamma_alt = read_doc_simple(alt_file)
+            stat_alt,gamma_alt,errorup_alt,errordown_alt = read_doc_simple(alt_file)
         except (FileNotFoundError, IndexError):
-            stat_alt,gamma_alt = ('ERROR','ERROR')
+            stat_alt,gamma_alt,errorup_alt,errordown_alt = ('ERROR','ERROR','ERROR','ERROR')
         
         #Return error if all stats are error
         if stat == 'ERROR' and stat_alt == 'ERROR' and stat_res == 'ERROR':
@@ -94,8 +114,8 @@ def get_best_model(data_dir, outroot, obsids):
         elif stat_alt != 'ERROR' and stat != 'ERROR' and stat - stat_alt > cutoff:
             best_models.append('alt')
 
-        #Else if main model's slope is physical, then pick that
-        elif gamma != 'ERROR' and gamma < 2.2 and gamma > 1.5:
+        #Else if main model's slope has errors and is physical within its errors, then pick that
+        elif gamma != 'ERROR' and errorup != 'ERROR' and errordown != 'ERROR' and gamma+errordown < 2.2 and gamma+errorup > 1.5:
             best_models.append('main')
 
         #Otherwise, return restricted, provided there's no error
