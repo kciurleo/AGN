@@ -115,7 +115,7 @@ def get_best_model(data_dir, outroot, obsids):
             best_models.append('alt')
 
         #Else if main model's slope has errors and is physical within its errors, then pick that
-        elif gamma != 'ERROR' and errorup != 'ERROR' and errordown != 'ERROR' and gamma+errordown < 2.2 and gamma+errorup > 1.5:
+        elif gamma != 'ERROR' and errorup != 'ERROR' and errordown != 'ERROR' and gamma+errordown < 2.2 and gamma+errorup > 1.7:
             best_models.append('main')
 
         #Otherwise, return restricted, provided there's no error
