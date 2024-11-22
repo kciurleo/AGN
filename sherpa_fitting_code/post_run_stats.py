@@ -62,6 +62,7 @@ unabsorbed=final_full.loc[final_full['unabsorbed']==True]
 always_unabsorbed=[]
 problem_children={}
 other_problem_children={}
+other_other_problem_children={}
 
 print(unabsorbed.columns)
 for id, row in unabsorbed.iterrows():
@@ -113,13 +114,36 @@ for id, row in unabsorbed.iterrows():
             #save the best one
             other_problem_children[obj] = precisist_obsid
 
+        #and with fx error
+        if obj not in other_other_problem_children:
+            obsids = obj_df['# ObsID']
+            min_error = np.inf
+            precisist_obsid = ''
+
+            for obsid in obsids:
+                #get luminosity error
+                try:
+                    #take the worst error
+                    errors=np.max([float(final_full.loc[final_full['# ObsID']==obsid].iloc[0]['flux210 error plus']),float(final_full.loc[final_full['# ObsID']==obsid].iloc[0]['flux210 error minus'])])
+                except: 
+                    errors=np.nan
+                #save the lum error if it's lower
+                if error < min_error:
+                    min_error=error
+                    precisist_obsid=obsid
+
+            #save the best one
+            other_other_problem_children[obj] = precisist_obsid
+
 
 #add our new "always unabs" and the corresponding brightest obsid for the not always guys
 unabsorbed['always unabs'] = unabsorbed['CXO name'].isin(always_unabsorbed)
 unabsorbed['brightest obsid'] = unabsorbed['CXO name'].map(problem_children)
 unabsorbed['precisist obsid'] = unabsorbed['CXO name'].map(other_problem_children)
-
+unabsorbed['precisist obsid fx'] = unabsorbed['CXO name'].map(other_other_problem_children)
 #note: the brightest and precisist are often the same but not always
+#note2: fx error is a proxy for fx/oiii ratio error, since each obsid of the same obj
+#should have the same error in oiii
 
 #these two numbers should add up to the first
 print()
@@ -184,6 +208,25 @@ for id, row in unabsorbed.iterrows():
             sloppy.append(obsid)
             unique_sloppy.append(name)
 
+bad=[]
+precisist_fx_stars=[]
+unique_bad=[]
+unique_precisist_fx_stars=[]
+for id, row in unabsorbed.iterrows():
+    #only care about Not always unabsorbed guys
+    obsids = set(unabsorbed['# ObsID'])
+
+    if row['always unabs']==False:
+        precisist=row['precisist obsid fx']
+        obsid=row['# ObsID']
+        name=row['CXO name']
+        if obsid == precisist:
+            precisist_fx_stars.append(obsid)
+            unique_precisist_fx_stars.append(name)
+        elif obsid != precisist and precisist not in obsids:
+            bad.append(obsid)
+            unique_bad.append(name)
+
 #save a df here
 
 print()
@@ -202,6 +245,11 @@ print(len(set(precisist_stars)), 'obsid-obj who are the precisist and also min a
 print()
 print(len(set(unique_sloppy)), 'unique objects imposters (not precisist, precisist isnt min abs)')
 print(len(set(unique_precisist_stars)), 'unique objects whose precisist obsid is min abs')
+print()
+print()
+print('fx error version')
+print(len(set(unique_bad)), 'unique objects imposters (not precisist, precisist fx isnt min abs)')
+print(len(set(unique_precisist_fx_stars)), 'unique objects whose precisist fx obsid is min abs')
 print()
 print()
 
@@ -254,15 +302,18 @@ plt.figure(figsize=(10,8))
 labels=['Total "min" abs', 'Always absorbed', 'Keepers','Imposters']
 values=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(unique_brightest_stars)), len(set(unique_imposters))]
 values2=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(unique_precisist_stars)), len(set(unique_sloppy))]
+values3=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(unique_precisist_fx_stars)), len(set(unique_bad))]
 colors=['r','g','b','purple']
-width=0.35
+width=0.25
 x_base = np.arange(len(labels))
 
 # Plot the first group of bars
-plt.bar(x_base - width/2, values, color=colors, width=width, label='Longest Exposure Time')
+plt.bar(x_base - width, values, color=colors, width=width, label='Longest Exposure Time')
 
 # Plot the second group of bars
-plt.bar(x_base + width/2, values2, color=colors, alpha=0.7, width=width, label='Smallest Luminosity Error')
+plt.bar(x_base, values2, color=colors, alpha=0.7, width=width, label='Smallest Luminosity Error')
+
+plt.bar(x_base + width, values3, color=colors, alpha=0.4, width=width, label='Smallest Fx Error')
 
 # Add labels, legend, and grid
 plt.xticks(x_base, labels)
