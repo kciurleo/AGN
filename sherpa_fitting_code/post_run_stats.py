@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+from upsetplot import from_contents
+import matplotlib.pyplot as plt
+import upsetplot as usp
 import os
 import best_model
 from astropy.io import fits
@@ -63,6 +65,8 @@ always_unabsorbed=[]
 problem_children={}
 other_problem_children={}
 other_other_problem_children={}
+MINother_other_problem_children={}
+gamma_problem_children={}
 
 print(unabsorbed.columns)
 for id, row in unabsorbed.iterrows():
@@ -128,12 +132,54 @@ for id, row in unabsorbed.iterrows():
                 except: 
                     errors=np.nan
                 #save the lum error if it's lower
+                if errors < min_error:
+                    min_error=errors
+                    precisist_obsid=obsid
+
+            #save the best one
+            other_other_problem_children[obj] = precisist_obsid
+
+        #and with min fx error
+        if obj not in MINother_other_problem_children:
+            obsids = obj_df['# ObsID']
+            min_error = np.inf
+            precisist_obsid = ''
+
+            for obsid in obsids:
+                #get luminosity error
+                try:
+                    #take the best error
+                    error=np.min([float(final_full.loc[final_full['# ObsID']==obsid].iloc[0]['flux210 error plus']),float(final_full.loc[final_full['# ObsID']==obsid].iloc[0]['flux210 error minus'])])
+                except: 
+                    error=np.nan
+                #save the lum error if it's lower
                 if error < min_error:
                     min_error=error
                     precisist_obsid=obsid
 
             #save the best one
-            other_other_problem_children[obj] = precisist_obsid
+            MINother_other_problem_children[obj] = precisist_obsid
+
+        #and with gamma error
+        if obj not in gamma_problem_children:
+            obsids = obj_df['# ObsID']
+            min_error = np.inf
+            precisist_obsid = ''
+
+            for obsid in obsids:
+                #get luminosity error
+                try:
+                    #take the worst error
+                    error=np.max([float(final_full.loc[final_full['# ObsID']==obsid].iloc[0]['gamma error plus']),float(final_full.loc[final_full['# ObsID']==obsid].iloc[0]['gamma error minus'])])
+                except: 
+                    error=np.nan
+                #save the lum error if it's lower
+                if error < min_error:
+                    min_error=errors
+                    precisist_obsid=obsid
+
+            #save the best one
+            gamma_problem_children[obj] = precisist_obsid
 
 
 #add our new "always unabs" and the corresponding brightest obsid for the not always guys
@@ -141,6 +187,9 @@ unabsorbed['always unabs'] = unabsorbed['CXO name'].isin(always_unabsorbed)
 unabsorbed['brightest obsid'] = unabsorbed['CXO name'].map(problem_children)
 unabsorbed['precisist obsid'] = unabsorbed['CXO name'].map(other_problem_children)
 unabsorbed['precisist obsid fx'] = unabsorbed['CXO name'].map(other_other_problem_children)
+unabsorbed['precisist obsid fx (MIN)'] = unabsorbed['CXO name'].map(MINother_other_problem_children)
+unabsorbed['precisist obsid gamma'] = unabsorbed['CXO name'].map(gamma_problem_children)
+
 #note: the brightest and precisist are often the same but not always
 #note2: fx error is a proxy for fx/oiii ratio error, since each obsid of the same obj
 #should have the same error in oiii
@@ -227,6 +276,44 @@ for id, row in unabsorbed.iterrows():
             bad.append(obsid)
             unique_bad.append(name)
 
+MINbad=[]
+MINprecisist_fx_stars=[]
+MINunique_bad=[]
+MINunique_precisist_fx_stars=[]
+for id, row in unabsorbed.iterrows():
+    #only care about Not always unabsorbed guys
+    obsids = set(unabsorbed['# ObsID'])
+
+    if row['always unabs']==False:
+        precisist=row['precisist obsid fx (MIN)']
+        obsid=row['# ObsID']
+        name=row['CXO name']
+        if obsid == precisist:
+            MINprecisist_fx_stars.append(obsid)
+            MINunique_precisist_fx_stars.append(name)
+        elif obsid != precisist and precisist not in obsids:
+            MINbad.append(obsid)
+            MINunique_bad.append(name)
+
+GAMMAbad=[]
+GAMMAprecisist_fx_stars=[]
+GAMMAunique_bad=[]
+GAMMAunique_precisist_fx_stars=[]
+for id, row in unabsorbed.iterrows():
+    #only care about Not always unabsorbed guys
+    obsids = set(unabsorbed['# ObsID'])
+
+    if row['always unabs']==False:
+        precisist=row['precisist obsid gamma']
+        obsid=row['# ObsID']
+        name=row['CXO name']
+        if obsid == precisist:
+            GAMMAprecisist_fx_stars.append(obsid)
+            GAMMAunique_precisist_fx_stars.append(name)
+        elif obsid != precisist and precisist not in obsids:
+            GAMMAbad.append(obsid)
+            GAMMAunique_bad.append(name)
+
 #save a df here
 
 print()
@@ -252,6 +339,34 @@ print(len(set(unique_bad)), 'unique objects imposters (not precisist, precisist 
 print(len(set(unique_precisist_fx_stars)), 'unique objects whose precisist fx obsid is min abs')
 print()
 print()
+print('fx error MIN version')
+print(len(set(MINunique_bad)), 'unique objects imposters (not precisist, precisist fx isnt min abs)')
+print(len(set(MINunique_precisist_fx_stars)), 'unique objects whose precisist fx obsid is min abs')
+print()
+print()
+print('gamma error version')
+print(len(set(GAMMAunique_bad)), 'unique objects imposters (not precisist, precisist gamma isnt min abs)')
+print(len(set(GAMMAunique_precisist_fx_stars)), 'unique objects whose precisist gamma obsid is min abs')
+print()
+print()
+
+print('---------- REJECTS ----------')
+print(f'luminsoity error has {len(set(unique_sloppy)-set(unique_imposters))} obj who arent in exp time version')
+print(f'exp time version has {len(set(unique_imposters)-set(unique_sloppy))} obj who arent in lum error version')
+print(f'{len(set(unique_sloppy)&set(unique_imposters))} are in both lum error and exp time')
+print()
+print(f'the two fx versions differ by {len(set(MINunique_bad)-set(unique_bad))} objs')
+print()
+print(f'gamma error has {len(set(GAMMAunique_bad)-set(unique_bad))} obj that arent in fx error')
+print(f'fx error has {len(set(unique_bad)-set(GAMMAunique_bad))} obj that arent in gamma error')
+print(f'{len(set(unique_bad)&set(GAMMAunique_bad))} are in both fx error and gamma error')
+
+print()
+print(f'fx error has {len(set(unique_bad)-set(unique_imposters))} obj who arent in exp time version')
+print(f'exp time version has {len(set(unique_imposters)-set(unique_bad))} obj who arent in fx error version')
+print(f'{len(set(unique_bad)&set(unique_imposters))} are in both fx error and exp time')
+print()
+print('is fx error same as luminosity error')
 
 #do some absorbed calcs
 absorbed_num=len(total)-(len(wav_error)+len(match_error)+len(fit_error))-len(compton)-len(final_reps)
@@ -303,20 +418,51 @@ labels=['Total "min" abs', 'Always absorbed', 'Keepers','Imposters']
 values=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(unique_brightest_stars)), len(set(unique_imposters))]
 values2=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(unique_precisist_stars)), len(set(unique_sloppy))]
 values3=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(unique_precisist_fx_stars)), len(set(unique_bad))]
+values4=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(MINunique_precisist_fx_stars)), len(set(MINunique_bad))]
+values5=[len(unabsorbed['CXO name'].unique()), len(always_unabsorbed), len(set(GAMMAunique_precisist_fx_stars)), len(set(GAMMAunique_bad))]
+
 colors=['r','g','b','purple']
-width=0.25
+width=0.2
 x_base = np.arange(len(labels))
 
 # Plot the first group of bars
-plt.bar(x_base - width, values, color=colors, width=width, label='Longest Exposure Time')
+bar1=plt.bar(x_base - 1.5 * width, values, color=colors, width=width, label='Longest Exposure Time')
 
 # Plot the second group of bars
-plt.bar(x_base, values2, color=colors, alpha=0.7, width=width, label='Smallest Luminosity Error')
+bar2=plt.bar(x_base - 0.5*width, values2, color=colors, alpha=0.8, width=width, label='Smallest Luminosity Error')
 
-plt.bar(x_base + width, values3, color=colors, alpha=0.4, width=width, label='Smallest Fx Error')
+bar3=plt.bar(x_base +0.5*width, values3, color=colors, alpha=0.6, width=width, label='Smallest Fx Error')
+
+#bar4=plt.bar(x_base +  width, values4, color=colors, alpha=0.5, width=width, label='Smallest Fx Error (MIN)')
+
+bar5=plt.bar(x_base + 1.5 * width, values5, color=colors, alpha=0.3, width=width, label='Smallest gamma error')
+
+# Add counts above the two bar graphs
+for rect in bar1 + bar2 + bar3 + bar5: 
+    height = rect.get_height()
+    plt.text(rect.get_x() + rect.get_width() / 2.0, height, f'{height:.0f}', ha='center', va='bottom')
+
 
 # Add labels, legend, and grid
 plt.xticks(x_base, labels)
 plt.ylabel("Unique Objects")
 plt.legend()
+plt.savefig(f"/Users/kciurleo/Documents/kciurleo/AGN/plots/bargraph_minabs.pdf", format="pdf")
+plt.show()
+
+#venn diagram
+sets = {
+    'Exp time': set(unique_brightest_stars),
+    'Luminosity': set(unique_precisist_stars),
+    'FX error': set(unique_precisist_fx_stars),
+    'Gamma error': set(GAMMAunique_precisist_fx_stars),
+}
+
+# Prepare data for upset plot
+data = from_contents(sets)
+
+# Create the plot
+usp.UpSet(data).plot()
+plt.title('number of keepers')
+plt.savefig(f"/Users/kciurleo/Documents/kciurleo/AGN/plots/upset_minabs.pdf", format="pdf")
 plt.show()
