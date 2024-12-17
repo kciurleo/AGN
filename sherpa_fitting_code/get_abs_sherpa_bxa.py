@@ -11,7 +11,7 @@ from run_stat_test_fp import calc_cstat
 import os
 import time
 
-def get_abs(nH,z,dir):
+def get_abs(nH,z,dir, name=np.nan):
     clean()
 
     #load the sci data
@@ -68,6 +68,28 @@ def get_abs(nH,z,dir):
     plt.savefig(f'{dir}/sherpa_data_fit.pdf')
     plt.close()
 
+    #save specifically for later plotting purposes
+    save(filename=f'{dir}/plotting_get_abs.save', clobber=True)
+
+    #Plotting
+    plt.figure(figsize=(10,6))
+    plot_fit(xlog=True, ylog=True) 
+    plot_model_component(p1, overplot=True, label='Source Model') 
+    #plot_model_component(abs1, overplot=True, label='absorption galaxy') 
+    #plot_model_component(abs2, overplot=True, label='absorption intrinsic') 
+    ax = plt.gca()
+
+    ticks = ax.get_xticks()
+    tick_labels = [r"1" if tick == 1 else fr"$10^{{{int(np.log10(tick))}}}$" for tick in ticks]
+    ax.set_xticklabels(tick_labels)
+    if not name == np.nan:
+        plt.title(name) 
+        plt.savefig(f'{dir}/{name}_AAS.png', dpi=300)
+    else:
+        plt.savefig(f'{dir}/first_AAS.png', dpi=300)
+
+    plt.legend(reverse=True)
+    plt.close()
 
     #get the value of cstat
     calc_stat_info()

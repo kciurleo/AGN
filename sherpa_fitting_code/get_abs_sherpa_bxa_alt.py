@@ -60,12 +60,21 @@ def get_abs_alt(nH,z,dir):
     #sherpa fit
     fit()
 
-
+    #save specifically for later plotting purposes
+    save(filename=f'{dir}/plotting_get_abs_alt.save', clobber=True)
 
     #make a plot
     plot_fit_resid(xlog=True,ylog=True)
     plt.title(None)
     plt.savefig(f'{dir}/sherpa_data_fit_alt.pdf')
+    plt.close()
+
+    #Plotting
+    plt.figure()
+    plot_fit(xlog=True, ylog=True) 
+    plot_model_component(p1, overplot=True, label='Double Power Law') 
+    print('plottin')
+    plt.savefig(f'{dir}/katie_test_alt.pdf')
     plt.close()
 
     #get the value of cstat

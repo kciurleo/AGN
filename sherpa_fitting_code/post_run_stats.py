@@ -409,6 +409,24 @@ plt.ylabel("Obj-Obsid combo")
 plt.legend()
 plt.show()
 
+#bar plot for my presentation
+plt.figure(figsize=(10,8))
+plt.style.use('dark_background')
+labels=['Errored AGN', 'Obscured AGN', 'Compton Thick AGN', 'Unobscured AGN', 'Unobscured \n Seyfert 2 AGN']
+sizes=[len(input_file['CSC21P_name'].unique())-len(final_full['CXO name'].unique()),len(absorbed['CXO name'].unique()), len(compton['ids'].unique()), len(unabsorbed['CXO name'].unique()), 11]
+colors=['dimgray','royalblue','orangered', 'green', 'gold']
+print(np.sum(sizes))
+ls=[]
+for i in range(len(labels)):
+    percentage = sizes[i]/np.sum(sizes)*100
+    label = f'{labels[i]} \n {percentage:.1f}%'
+    ls.append(label)
+
+plt.figure(figsize=(10,10))
+
+plt.pie(sizes, labels=ls, colors=colors)
+plt.show()
+
 #bar plot of fits or something?
 
 
@@ -464,5 +482,5 @@ data = from_contents(sets)
 # Create the plot
 usp.UpSet(data).plot()
 plt.title('number of keepers')
-plt.savefig(f"/Users/kciurleo/Documents/kciurleo/AGN/plots/upset_minabs.pdf", format="pdf")
+#plt.savefig(f"/Users/kciurleo/Documents/kciurleo/AGN/plots/upset_minabs.pdf", format="pdf")
 plt.show()

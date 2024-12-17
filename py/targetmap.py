@@ -54,13 +54,13 @@ print(len(set(agostino['CSC21P_name'])|set(portsmouth['CSC21P_name'])))
 print(len(unabsorbed['CXO name'].unique()))
 print(len(s2s_xmm['CXO name'].unique()))
 
-ras=[data['ra'], point_sources['ra'], pd.concat([agostino['ra_x'],portsmouth['ra_x']])]
-decs=[data['dec'], point_sources['dec'], pd.concat([agostino['dec_x'],portsmouth['dec_x']])]
-colors=['dimgrey', 'royalblue', 'red']
-labels=['Chandra Source Catalog', 'SDSS Counterparts', 'AGN']
-alphas=[.15, .15,  1]
-markers=['o', 'o',  'x']
-sizes=[4,4,60]
+ras=[data['ra'], point_sources['ra'], pd.concat([agostino['ra_x'],portsmouth['ra_x']]), unabsorbed['RA'], s2s_xmm['RA']]
+decs=[data['dec'], point_sources['dec'], pd.concat([agostino['dec_x'],portsmouth['dec_x']]), unabsorbed['Dec'], s2s_xmm['Dec']]
+colors=['dimgrey', 'royalblue', 'red', 'lime', 'gold']
+labels=['Chandra Source Catalog', 'SDSS Counterparts', 'AGN', 'Unabsorbed AGN', 'Preliminary Seyfert 2s']
+alphas=[.15, .15, .25, .25, 1]
+markers=['o', 'o', 'x', 'x', '*']
+sizes=[4,4,20, 20, 80]
 
 #Meridian at SagA*, where eROSITA cuts off
 lon_meridian = 359.94423568 * u.deg
@@ -81,7 +81,7 @@ def flip(ra):
     return(-ra)
 
 #Make plot
-fig = plt.figure(figsize=(16,10))
+fig = plt.figure(figsize=(20.2, 8.18))
 plt.style.use('dark_background')
 ax = fig.add_subplot(111, projection="aitoff")
 '''
@@ -104,7 +104,7 @@ plt.xticks(ticks=np.radians([-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]
            labels=['330°', '300°', '270°', '240°',  '210°', '180°', '150°', '120°', '90°','60°', '30°'])
 
 plt.grid()
-plt.legend(loc="upper right")
-plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/map3.png", dpi=250)
+plt.legend(loc="upper right", fontsize=18, bbox_to_anchor=(1.2, 1.05))
+plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/AAS_map5.png", dpi=100)
 #plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/target_map.pdf", format="pdf")
 plt.show()
