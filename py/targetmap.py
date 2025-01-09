@@ -11,7 +11,7 @@ import astropy.units as u
 #Read in data
 seyferts=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/seyferts.csv')
 data=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv')
-XMM_result = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/XMM_query_result.vot').to_table().to_pandas()
+XMM_result = votable.parse_single_table('/Users/kciurleo/Documents/kciurleo/AGN/csvs/XMM_4arcsec_query_result.vot').to_table().to_pandas()
 erosita = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/topcat_erosita.csv')
 final_full = pd.read_csv('/opt/pwdata/katie/csc2.1/final_data/final_info_full.csv')
 s2s_xmm = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/xmm_proposal_s2s.csv')
@@ -54,13 +54,13 @@ print(len(set(agostino['CSC21P_name'])|set(portsmouth['CSC21P_name'])))
 print(len(unabsorbed['CXO name'].unique()))
 print(len(s2s_xmm['CXO name'].unique()))
 
-ras=[data['ra'], point_sources['ra'], pd.concat([agostino['ra_x'],portsmouth['ra_x']]), unabsorbed['RA'], s2s_xmm['RA']]
-decs=[data['dec'], point_sources['dec'], pd.concat([agostino['dec_x'],portsmouth['dec_x']]), unabsorbed['Dec'], s2s_xmm['Dec']]
+ras=[data['ra'], point_sources['ra'], pd.concat([agostino['ra_x'],portsmouth['ra_x']])]
+decs=[data['dec'], point_sources['dec'], pd.concat([agostino['dec_x'],portsmouth['dec_x']])]
 colors=['dimgrey', 'royalblue', 'red', 'lime', 'gold']
-labels=['Chandra Source Catalog', 'SDSS Counterparts', 'AGN', 'Unabsorbed AGN', 'Preliminary Seyfert 2s']
-alphas=[.15, .15, .25, .25, 1]
-markers=['o', 'o', 'x', 'x', '*']
-sizes=[4,4,20, 20, 80]
+labels=['Chandra Source Catalog', 'SDSS Counterparts', 'Portsmouth/Agostino AGNs']
+alphas=[.15, .25, 1]
+markers=['o', 'o', 'x']
+sizes=[4,4,70]
 
 #Meridian at SagA*, where eROSITA cuts off
 lon_meridian = 359.94423568 * u.deg
@@ -105,6 +105,6 @@ plt.xticks(ticks=np.radians([-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]
 
 plt.grid()
 plt.legend(loc="upper right", fontsize=18, bbox_to_anchor=(1.2, 1.05))
-plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/AAS_map5.png", dpi=100)
+plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/AAS_map3.png", dpi=100)
 #plt.savefig("/Users/kciurleo/Documents/kciurleo/AGN/plots/target_map.pdf", format="pdf")
 plt.show()

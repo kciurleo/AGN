@@ -158,7 +158,7 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     res = pd.read_csv(f'{outroot}/allinfo_full_withratio_res.csv')
     final_full = pd.read_csv('/opt/pwdata/katie/csc2.1/final_data/final_info_full.csv')
 
-
+    '''
     alt=final_full.loc[final_full['model']=='alt']
 
     new_main=main.loc[~main['CXO name'].isin(alt['CXO name'])]
@@ -169,6 +169,7 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     plt.axvline(2.2, color='black')
     plt.xlabel('Gamma')
     plt.show()
+    '''
     '''
     interesting_guys=new_main.loc[(new_main['gamma']!='ERROR')]
     interesting_guys=interesting_guys.loc[(interesting_guys['gamma'].astype(float)>1.5) & (interesting_guys['gamma'].astype(float)<2.2)]
@@ -182,7 +183,7 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
     plt.xlabel('Gamma error')
     plt.show()
     '''
-    '''
+
     fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10,10))
 
     ax1, ax2, ax3, ax4, ax5, ax6 = axes.flatten()
@@ -222,11 +223,13 @@ def make_histograms(outroot, cstat_bins, del_cstat_bins):
 
     plt.figure(figsize=(8,6))
     plt.hist(pd.to_numeric(main['Cstat'], errors='coerce')-pd.to_numeric(alt['Cstat'], errors='coerce'), bins = del_cstat_bins*3)
-    plt.ylabel('Main-Alt')
-    plt.xlabel('del Cstat')
-    plt.xlim(-20,20)
+    plt.axvline(mean+3*std_dev, color='black', linestyle='dashed')
+    plt.title('Main Fit - Alt Fit')
+    plt.xlabel(r'$\Delta$C')
+    #plt.xlim(-20,20)
+    plt.savefig(f'{outroot}/del_cstat_histogram.pdf', format='pdf')
     plt.show()
-    '''
+    
 
 def diagnose_best_fit(outroot):
     def agreement(value1, errors1, value2, errors2):
@@ -344,13 +347,13 @@ def diagnose_best_fit(outroot):
     plt.hist(pd.to_numeric(basicagreementdudes['gamma'], errors='coerce'), bins=100, alpha=0.5, label='Errors agree with 1.9')
     plt.axvline(1.7, color='black', label='Original cutoff (1.7-2.2)')
     plt.axvline(2.2, color='black')
-    plt.axvline(1.5, color='black', linestyle='dashed', label='Current cutoff (1.5-2.2)')
-    plt.xlabel('Gamma')
+    #plt.axvline(1.5, color='black', linestyle='dashed', label='Current cutoff (1.5-2.2)')
+    plt.xlabel('Photon Index')
     plt.legend()
-    plt.title('Main fit gamma, Bins=100')
+    plt.title('Main Fit Photon Index')
     plt.savefig('/Users/kciurleo/Documents/kciurleo/AGN/plots/histogram_gamma_main.pdf', format="pdf")
     plt.show()
 
 if __name__ == '__main__':
     outroot='/opt/pwdata/katie/csc2.1/'
-    diagnose_best_fit(outroot)
+    make_histograms(outroot, 50,30)

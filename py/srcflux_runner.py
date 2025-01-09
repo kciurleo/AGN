@@ -140,6 +140,15 @@ match_error_full_info['counts']=counts
 #Save file
 match_error_full_info.to_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/match_error_srcflux.csv', index=False)
 
+#Print some info
+print('all match errors: ',len(match_error_full_info['counts']))
+less_25=match_error_full_info.loc[match_error_full_info['counts']<=25]
+print('less than 25 counts match errors: ',len(less_25['counts']),' or as percent: ', len(less_25['counts'])/len(match_error_full_info['counts']))
+zeds=match_error_full_info.loc[match_error_full_info['counts']==0]
+print('zeros: ', len(zeds['counts']), ' or as a percent: ', len(zeds['counts'])/len(match_error_full_info['counts']))
+#print('unique all match errors: ',len(set(match_error_full_info['# NAME'])))
+#print('unique less than 25 counts match errors: ',len(set(less_25['# NAME'])))
+print(match_error_full_info.columns)
 plt.figure(figsize=(8,6))
 plt.hist(match_error_full_info['counts'], bins=40)
 plt.title('Matching Errors - Individual Source Detection')

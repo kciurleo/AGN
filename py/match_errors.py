@@ -12,7 +12,7 @@ match_errors = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/match_er
 final_list=pd.read_csv('/opt/pwdata/katie/csc2.1/data_full.txt', skiprows=1, delimiter='  ',engine='python',names=['NAME','OBSID','RA', 'DEC', 'Z', 'nH', 'COUNTS'])
 #csc21=pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/CSC2.1p_OIR_SDSSspecmatch.csv', low_memory=False)
 combined_match_errors = pd.read_csv('/Users/kciurleo/Documents/kciurleo/AGN/csvs/match_errors_with_fluxes.csv')
-'''
+
 nums=[]
 presents=[]
 for i, row in match_errors.iterrows():
@@ -43,7 +43,7 @@ match_errors['PRESENT']=presents
 
 #print(match_errors)
 
-'''
+
 
 #Those who are present or not in their FOV
 present = match_errors.loc[match_errors['PRESENT']==True]
@@ -112,6 +112,7 @@ plt.figure(figsize=(8,6))
 plt.hist(all_naughty_guys['counts'], bins=40)
 plt.title('Matching Errors - Present Fully Unmatched Objects')
 plt.xlabel('Counts')
+plt.savefig('/Users/kciurleo/Documents/kciurleo/AGN/plots/fully_unmatched_histogram.pdf', format='pdf')
 plt.show()
 
 #check the date for all the bright ones
